@@ -26,6 +26,13 @@
 		l2-cache {
 			power-domain = <&l2ccc_0>;
 		};
+
+		idle-states {
+			/delete-property/ entry-method;
+			cpu-sleep-0 {
+				compatible = "qcom,idle-state-spc", "arm,idle-state";
+			};
+		};
 	};
 
 	psci {
