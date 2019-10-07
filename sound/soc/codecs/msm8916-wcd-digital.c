@@ -1022,11 +1022,6 @@ static const struct snd_soc_dapm_route msm8916_wcd_digital_audio_map[] = {
 	{"RX3 MIX1 INP2", "IIR1", "IIR1"},
 	{"RX3 MIX1 INP2", "IIR2", "IIR2"},
 
-	{"RX1 MIX2 INP1", "IIR1", "IIR1"},
-	{"RX2 MIX2 INP1", "IIR1", "IIR1"},
-	{"RX1 MIX2 INP1", "IIR2", "IIR2"},
-	{"RX2 MIX2 INP1", "IIR2", "IIR2"},
-
 	{"IIR1", NULL, "IIR1 INP1 MUX"},
 	{"IIR1 INP1 MUX", "DEC1", "DEC1 MUX"},
 	{"IIR1 INP1 MUX", "DEC2", "DEC2 MUX"},
