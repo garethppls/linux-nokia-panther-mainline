@@ -539,6 +539,12 @@ static void sm5502_init_dev_type(struct sm5502_muic_info *info)
 			val = info->reg_data[i].val;
 		regmap_write(info->regmap, info->reg_data[i].reg, val);
 	}
+
+	/* Clear pending interrupts */
+	regmap_read(info->regmap, SM5502_REG_INT1, &reg_data);
+	regmap_read(info->regmap, SM5502_REG_INT2, &reg_data);
+	regmap_read(info->regmap, SM5502_REG_INT1, &reg_data);
+	regmap_read(info->regmap, SM5502_REG_INT2, &reg_data);
 }
 
 static int sm5022_muic_i2c_probe(struct i2c_client *i2c,
