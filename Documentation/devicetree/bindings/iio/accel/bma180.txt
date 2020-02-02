@@ -11,6 +11,7 @@ Required properties:
     "bosch,bma150"
     "bosch,bma180"
     "bosch,bma250"
+    "bosch,bma253"
     "bosch,bma254"
     "bosch,smb380"
   - reg : the I2C address of the sensor
