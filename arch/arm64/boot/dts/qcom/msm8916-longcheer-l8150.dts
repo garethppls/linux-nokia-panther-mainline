@@ -9,6 +9,7 @@
 #include <dt-bindings/iio/qcom,spmi-vadc.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/leds/common.h>
 #include <dt-bindings/pinctrl/qcom,pmic-mpp.h>
 #include <dt-bindings/sound/apq8016-lpass.h>
 
@@ -267,6 +268,21 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&ctp_pwr_en_default>;
 	};
+
+	flash-led-controller {
+		compatible = "sgmicro,sgm3140";
+		flash-gpios = <&msmgpio 31 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&msmgpio 32 GPIO_ACTIVE_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&camera_flash_default>;
+
+		flash_led: led {
+			function = LED_FUNCTION_FLASH;
+			color = <LED_COLOR_ID_WHITE>;
+			flash-max-timeout-us = <250000>;
+		};
+	};
 };
 
 &blsp_i2c2 {
@@ -372,6 +388,18 @@
 };
 
 &msmgpio {
+	camera_flash_default: camera_flash_default {
+		pinmux {
+			function = "gpio";
+			pins = "gpio31", "gpio32";
+		};
+		pinconf {
+			pins = "gpio31", "gpio32";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+
 	ctp_pwr_en_default: ctp_pwr_en_default {
 		pinmux {
 			function = "gpio";
