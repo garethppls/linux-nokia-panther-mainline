@@ -8,6 +8,7 @@
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
+#include <dt-bindings/pinctrl/qcom,pmic-mpp.h>
 
 / {
 	model = "BQ Aquaris X5";
@@ -91,6 +92,15 @@
 		};
 	};
 
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pm8916_pwm 0 100000>;
+
+		brightness-levels = <0 255>;
+		num-interpolated-steps = <255>;
+		default-brightness-level = <255>;
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 
@@ -124,6 +134,7 @@
 		reg = <0>;
 
 		power-supply = <&pm8916_l17>;
+		backlight = <&backlight>;
 		reset-gpios = <&msmgpio 25 GPIO_ACTIVE_HIGH>;
 
 		ports {
@@ -158,6 +169,14 @@
 				bias-pull-up;
 				linux,code = <KEY_VOLUMEDOWN>;
 			};
+		};
+	};
+
+	pm8916@1 {
+		pwm@bc00 {
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pwm_out>;
 		};
 	};
 };
@@ -323,6 +342,18 @@
 			pins = "gpio110";
 			drive-strength = <8>;
 			bias-pull-up;
+		};
+	};
+};
+
+&pm8916_mpps {
+	pwm_out: pm8916_mpp4 {
+		pinconf {
+			pins = "mpp4";
+			function = "digital";
+			output-low;
+			power-source = <PM8916_MPP_VPH>;
+			qcom,dtest = <1>;
 		};
 	};
 };
