@@ -87,6 +87,24 @@
 		pinctrl-0 = <&usb_id_default>;
 	};
 
+	bat: battery {
+		compatible = "simple-battery";
+		voltage-min-design-microvolt = <3400000>;
+		voltage-max-design-microvolt = <4350000>;
+		energy-full-design-microwatt-hours = <9500000>;
+		charge-full-design-microamp-hours = <2500000>;
+
+		ocv-capacity-celsius = <25>;
+		ocv-capacity-table-0 = <4332000 100>, <4267000 95>, <4210000 90>,
+			<4155000 85>, <4102000 80>, <4056000 75>, <3992000 70>,
+			<3956000 65>, <3912000 60>, <3869000 55>, <3839000 50>,
+			<3816000 45>, <3798000 40>, <3783000 35>, <3771000 30>,
+			<3759000 25>, <3742000 20>, <3722000 16>, <3701000 13>,
+			<3693000 11>, <3691000 10>, <3690000 9>, <3688000 8>,
+			<3685000 7>, <3679000 6>, <3657000 5>, <3614000 4>,
+			<3555000 3>, <3475000 2>, <3356000 1>, <3000000 0>;
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 
