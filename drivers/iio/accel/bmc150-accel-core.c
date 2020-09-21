@@ -27,6 +27,7 @@
 #include <linux/iio/trigger_consumer.h>
 #include <linux/iio/triggered_buffer.h>
 #include <linux/regmap.h>
+#include <linux/regulator/consumer.h>
 
 #include "bmc150-accel.h"
 
@@ -184,6 +185,7 @@ enum bmc150_accel_trigger_id {
 struct bmc150_accel_data {
 	struct regmap *regmap;
 	int irq;
+	struct regulator_bulk_data regulators[2];
 	struct bmc150_accel_interrupt interrupts[BMC150_ACCEL_INTERRUPTS];
 	struct bmc150_accel_trigger triggers[BMC150_ACCEL_TRIGGERS];
 	struct mutex mutex;
@@ -1572,14 +1574,28 @@ int bmc150_accel_core_probe(struct device *dev, struct regmap *regmap, int irq,
 
 	data->regmap = regmap;
 
+	data->regulators[0].supply = "vdd";
+	data->regulators[1].supply = "vddio";
+	ret = devm_regulator_bulk_get(dev, ARRAY_SIZE(data->regulators),
+				      data->regulators);
+	if (ret)
+		return dev_err_probe(dev, ret, "Failed to get regulators\n");
+
 	ret = iio_read_mount_matrix(dev, "mount-matrix",
 				     &data->orientation);
 	if (ret)
 		return ret;
 
+	ret = regulator_bulk_enable(ARRAY_SIZE(data->regulators),
+				    data->regulators);
+	if (ret < 0) {
+		dev_err(dev, "Failed to enable regulators\n");
+		return ret;
+	}
+
 	ret = bmc150_accel_chip_init(data);
 	if (ret < 0)
-		return ret;
+		goto err_regulator_disable;
 
 	mutex_init(&data->mutex);
 
@@ -1596,7 +1612,7 @@ int bmc150_accel_core_probe(struct device *dev, struct regmap *regmap, int irq,
 					 &bmc150_accel_buffer_ops);
 	if (ret < 0) {
 		dev_err(dev, "Failed: iio triggered buffer setup\n");
-		return ret;
+		goto err_regulator_disable;
 	}
 
 	if (data->irq > 0) {
@@ -1657,6 +1673,8 @@ err_trigger_unregister:
 	bmc150_accel_unregister_triggers(data, BMC150_ACCEL_TRIGGERS - 1);
 err_buffer_cleanup:
 	iio_triggered_buffer_cleanup(indio_dev);
+err_regulator_disable:
+	regulator_bulk_disable(ARRAY_SIZE(data->regulators), data->regulators);
 
 	return ret;
 }
