@@ -707,7 +707,8 @@ static unsigned int of_lpass_cpu_parse_sd_lines(struct device *dev,
 }
 
 static void of_lpass_cpu_parse_dai_data(struct device *dev,
-					struct lpass_data *data)
+					struct lpass_data *data,
+					struct lpass_variant *variant)
 {
 	struct device_node *node;
 	int ret, id;
@@ -724,7 +725,7 @@ static void of_lpass_cpu_parse_dai_data(struct device *dev,
 			dev_err(dev, "valid dai id not found: %d\n", ret);
 			continue;
 		}
-		if (id == LPASS_DP_RX) {
+		if (id == variant->hdmi_dai) {
 			data->hdmi_port_enable = 1;
 			dev_err(dev, "HDMI Port is enabled: %d\n", id);
 		} else {
@@ -766,7 +767,7 @@ int asoc_qcom_lpass_cpu_platform_probe(struct platform_device *pdev)
 	drvdata->variant = (struct lpass_variant *)match->data;
 	variant = drvdata->variant;
 
-	of_lpass_cpu_parse_dai_data(dev, drvdata);
+	of_lpass_cpu_parse_dai_data(dev, drvdata, variant);
 
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "lpass-lpaif");
 
@@ -820,7 +821,7 @@ int asoc_qcom_lpass_cpu_platform_probe(struct platform_device *pdev)
 
 	for (i = 0; i < variant->num_dai; i++) {
 		dai_id = variant->dai_driver[i].id;
-		if (dai_id == LPASS_DP_RX)
+		if (dai_id == variant->hdmi_dai)
 			continue;
 
 		drvdata->mi2s_osr_clk[dai_id] = devm_clk_get(dev,

@@ -128,7 +128,7 @@ static int lpass_platform_pcmops_open(struct snd_soc_component *component,
 		return dma_ch;
 	}
 
-	if (cpu_dai->driver->id == LPASS_DP_RX) {
+	if (cpu_dai->driver->id == v->hdmi_dai) {
 		map = drvdata->hdmiif_map;
 		drvdata->hdmi_substream[dma_ch] = substream;
 	} else {
@@ -173,7 +173,7 @@ static int lpass_platform_pcmops_close(struct snd_soc_component *component,
 	unsigned int dai_id = cpu_dai->driver->id;
 
 	data = runtime->private_data;
-	if (dai_id == LPASS_DP_RX)
+	if (dai_id == v->hdmi_dai)
 		drvdata->hdmi_substream[data->dma_ch] = NULL;
 	else
 		drvdata->substream[data->dma_ch] = NULL;
@@ -205,7 +205,7 @@ static int lpass_platform_pcmops_hw_params(struct snd_soc_component *component,
 
 	if (dir ==  SNDRV_PCM_STREAM_PLAYBACK) {
 		id = pcm_data->dma_ch;
-		if (dai_id == LPASS_DP_RX)
+		if (dai_id == v->hdmi_dai)
 			dmactl = drvdata->hdmi_rd_dmactl;
 		else
 			dmactl = drvdata->rd_dmactl;
@@ -234,8 +234,7 @@ static int lpass_platform_pcmops_hw_params(struct snd_soc_component *component,
 		return ret;
 	}
 
-	switch (dai_id) {
-	case LPASS_DP_RX:
+	if (dai_id == v->hdmi_dai) {
 		ret = regmap_fields_write(dmactl->burst8, id,
 							LPAIF_DMACTL_BURSTEN_INCR4);
 		if (ret) {
@@ -254,9 +253,7 @@ static int lpass_platform_pcmops_hw_params(struct snd_soc_component *component,
 			dev_err(soc_runtime->dev, "error updating dynbursten field: %d\n", ret);
 			return ret;
 		}
-		break;
-	case MI2S_PRIMARY:
-	case MI2S_SECONDARY:
+	} else {
 		ret = regmap_fields_write(dmactl->intf, id,
 						LPAIF_DMACTL_AUDINTF(dma_port));
 		if (ret) {
@@ -264,12 +261,8 @@ static int lpass_platform_pcmops_hw_params(struct snd_soc_component *component,
 					ret);
 			return ret;
 		}
-
-		break;
-	default:
-		dev_err(soc_runtime->dev, "%s: invalid  interface: %d\n", __func__, dai_id);
-		break;
 	}
+
 	switch (bitwidth) {
 	case 16:
 		switch (channels) {
@@ -299,22 +292,22 @@ static int lpass_platform_pcmops_hw_params(struct snd_soc_component *component,
 			regval = LPAIF_DMACTL_WPSCNT_ONE;
 			break;
 		case 2:
-			regval = (dai_id == LPASS_DP_RX ?
+			regval = (dai_id == v->hdmi_dai ?
 			LPAIF_DMACTL_WPSCNT_ONE :
 			LPAIF_DMACTL_WPSCNT_TWO);
 			break;
 		case 4:
-			regval = (dai_id == LPASS_DP_RX ?
+			regval = (dai_id == v->hdmi_dai ?
 			LPAIF_DMACTL_WPSCNT_TWO :
 			LPAIF_DMACTL_WPSCNT_FOUR);
 			break;
 		case 6:
-			regval = (dai_id == LPASS_DP_RX ?
+			regval = (dai_id == v->hdmi_dai ?
 			LPAIF_DMACTL_WPSCNT_THREE :
 			LPAIF_DMACTL_WPSCNT_SIX);
 			break;
 		case 8:
-			regval = (dai_id == LPASS_DP_RX ?
+			regval = (dai_id == v->hdmi_dai ?
 			LPAIF_DMACTL_WPSCNT_FOUR :
 			LPAIF_DMACTL_WPSCNT_EIGHT);
 			break;
@@ -354,7 +347,7 @@ static int lpass_platform_pcmops_hw_free(struct snd_soc_component *component,
 	struct regmap *map;
 	unsigned int dai_id = cpu_dai->driver->id;
 
-	if (dai_id == LPASS_DP_RX)
+	if (dai_id == v->hdmi_dai)
 		map = drvdata->hdmiif_map;
 	else
 		map = drvdata->lpaif_map;
@@ -386,7 +379,7 @@ static int lpass_platform_pcmops_prepare(struct snd_soc_component *component,
 
 	ch = pcm_data->dma_ch;
 	if (dir ==  SNDRV_PCM_STREAM_PLAYBACK) {
-		if (dai_id == LPASS_DP_RX) {
+		if (dai_id == v->hdmi_dai) {
 			dmactl = drvdata->hdmi_rd_dmactl;
 			map = drvdata->hdmiif_map;
 		} else {
@@ -456,7 +449,7 @@ static int lpass_platform_pcmops_trigger(struct snd_soc_component *component,
 	ch = pcm_data->dma_ch;
 	if (dir ==  SNDRV_PCM_STREAM_PLAYBACK) {
 		id = pcm_data->dma_ch;
-		if (dai_id == LPASS_DP_RX) {
+		if (dai_id == v->hdmi_dai) {
 			dmactl = drvdata->hdmi_rd_dmactl;
 			map = drvdata->hdmiif_map;
 		} else {
@@ -480,8 +473,8 @@ static int lpass_platform_pcmops_trigger(struct snd_soc_component *component,
 				"error writing to rdmactl reg: %d\n", ret);
 			return ret;
 		}
-		switch (dai_id) {
-		case LPASS_DP_RX:
+
+		if (dai_id == v->hdmi_dai) {
 			ret = regmap_fields_write(dmactl->dyncclk, id,
 					 LPAIF_DMACTL_DYNCLK_ON);
 			if (ret) {
@@ -504,9 +497,7 @@ static int lpass_platform_pcmops_trigger(struct snd_soc_component *component,
 					LPAIF_IRQ_HDMI_REQ_ON_PRELOAD(ch) |
 					LPAIF_IRQ_HDMI_METADONE |
 					LPAIF_IRQ_HDMI_SDEEP_AUD_DIS(ch));
-			break;
-		case MI2S_PRIMARY:
-		case MI2S_SECONDARY:
+		} else {
 			reg_irqclr = LPAIF_IRQCLEAR_REG(v, LPAIF_IRQ_PORT_HOST);
 			val_irqclr = LPAIF_IRQ_ALL(ch);
 
@@ -514,10 +505,6 @@ static int lpass_platform_pcmops_trigger(struct snd_soc_component *component,
 			reg_irqen = LPAIF_IRQEN_REG(v, LPAIF_IRQ_PORT_HOST);
 			val_mask = LPAIF_IRQ_ALL(ch);
 			val_irqen = LPAIF_IRQ_ALL(ch);
-			break;
-		default:
-			dev_err(soc_runtime->dev, "%s: invalid %d interface\n", __func__, dai_id);
-			return -EINVAL;
 		}
 
 		ret = regmap_write(map, reg_irqclr, val_irqclr);
@@ -541,8 +528,8 @@ static int lpass_platform_pcmops_trigger(struct snd_soc_component *component,
 				"error writing to rdmactl reg: %d\n", ret);
 			return ret;
 		}
-		switch (dai_id) {
-		case LPASS_DP_RX:
+
+		if (dai_id == v->hdmi_dai) {
 			ret = regmap_fields_write(dmactl->dyncclk, id,
 					 LPAIF_DMACTL_DYNCLK_OFF);
 			if (ret) {
@@ -556,16 +543,10 @@ static int lpass_platform_pcmops_trigger(struct snd_soc_component *component,
 					LPAIF_IRQ_HDMI_METADONE |
 					LPAIF_IRQ_HDMI_SDEEP_AUD_DIS(ch));
 			val_irqen = 0;
-			break;
-		case MI2S_PRIMARY:
-		case MI2S_SECONDARY:
+		} else {
 			reg_irqen = LPAIF_IRQEN_REG(v, LPAIF_IRQ_PORT_HOST);
 			val_mask = LPAIF_IRQ_ALL(ch);
 			val_irqen = 0;
-			break;
-		default:
-			dev_err(soc_runtime->dev, "%s: invalid %d interface\n", __func__, dai_id);
-			return -EINVAL;
 		}
 
 		ret = regmap_update_bits(map, reg_irqen, val_mask, val_irqen);
@@ -595,7 +576,7 @@ static snd_pcm_uframes_t lpass_platform_pcmops_pointer(
 	struct regmap *map;
 	unsigned int dai_id = cpu_dai->driver->id;
 
-	if (dai_id == LPASS_DP_RX)
+	if (dai_id == v->hdmi_dai)
 		map = drvdata->hdmiif_map;
 	else
 		map = drvdata->lpaif_map;
@@ -645,24 +626,18 @@ static irqreturn_t lpass_dma_interrupt_handler(
 	struct regmap *map;
 	unsigned int dai_id = cpu_dai->driver->id;
 
-	switch (dai_id) {
-	case LPASS_DP_RX:
+	if (dai_id == v->hdmi_dai) {
 		map = drvdata->hdmiif_map;
 		reg = LPASS_HDMITX_APP_IRQCLEAR_REG(v);
 		val = (LPAIF_IRQ_HDMI_REQ_ON_PRELOAD(chan) |
 		LPAIF_IRQ_HDMI_METADONE |
 		LPAIF_IRQ_HDMI_SDEEP_AUD_DIS(chan));
-	break;
-	case MI2S_PRIMARY:
-	case MI2S_SECONDARY:
+	} else {
 		map = drvdata->lpaif_map;
 		reg = LPAIF_IRQCLEAR_REG(v, LPAIF_IRQ_PORT_HOST);
 		val = 0;
-	break;
-	default:
-	dev_err(soc_runtime->dev, "%s: invalid  %d interface\n", __func__, dai_id);
-	return -EINVAL;
 	}
+
 	if (interrupts & LPAIF_IRQ_PER(chan)) {
 
 		rv = regmap_write(map, reg, LPAIF_IRQ_PER(chan) | val);
@@ -826,10 +801,11 @@ static void lpass_platform_pcm_free(struct snd_soc_component *component,
 static int lpass_platform_pcmops_suspend(struct snd_soc_component *component)
 {
 	struct lpass_data *drvdata = snd_soc_component_get_drvdata(component);
+	struct lpass_variant *v = drvdata->variant;
 	struct regmap *map;
 	unsigned int dai_id = component->id;
 
-	if (dai_id == LPASS_DP_RX)
+	if (dai_id == v->hdmi_dai)
 		map = drvdata->hdmiif_map;
 	else
 		map = drvdata->lpaif_map;
@@ -843,10 +819,11 @@ static int lpass_platform_pcmops_suspend(struct snd_soc_component *component)
 static int lpass_platform_pcmops_resume(struct snd_soc_component *component)
 {
 	struct lpass_data *drvdata = snd_soc_component_get_drvdata(component);
+	struct lpass_variant *v = drvdata->variant;
 	struct regmap *map;
 	unsigned int dai_id = component->id;
 
-	if (dai_id == LPASS_DP_RX)
+	if (dai_id == v->hdmi_dai)
 		map = drvdata->hdmiif_map;
 	else
 		map = drvdata->lpaif_map;

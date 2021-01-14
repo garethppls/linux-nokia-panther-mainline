@@ -271,6 +271,7 @@ static struct lpass_variant sc7180_data = {
 	.num_clks		= 3,
 	.dai_driver		= sc7180_lpass_cpu_dai_driver,
 	.num_dai		= ARRAY_SIZE(sc7180_lpass_cpu_dai_driver),
+	.hdmi_dai		= LPASS_DP_RX,
 	.dai_osr_clk_names      = (const char *[]) {
 				   "mclk0",
 				   "null",

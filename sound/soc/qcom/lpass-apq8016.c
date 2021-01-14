@@ -273,6 +273,7 @@ static struct lpass_variant apq8016_data = {
 	.num_clks		= 2,
 	.dai_driver		= apq8016_lpass_cpu_dai_driver,
 	.num_dai		= ARRAY_SIZE(apq8016_lpass_cpu_dai_driver),
+	.hdmi_dai		= LPASS_HDMI_DAI_UNSUPPORTED,
 	.dai_osr_clk_names	= (const char *[]) {
 				"mi2s-osr-clk0",
 				"mi2s-osr-clk1",

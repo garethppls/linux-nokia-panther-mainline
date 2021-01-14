@@ -12,13 +12,14 @@
 #include <linux/compiler.h>
 #include <linux/platform_device.h>
 #include <linux/regmap.h>
-#include <dt-bindings/sound/sc7180-lpass.h>
 #include "lpass-hdmi.h"
 
 #define LPASS_AHBIX_CLOCK_FREQUENCY		131072000
 #define LPASS_MAX_MI2S_PORTS			(8)
 #define LPASS_MAX_DMA_CHANNELS			(8)
 #define LPASS_MAX_HDMI_DMA_CHANNELS		(4)
+
+#define LPASS_HDMI_DAI_UNSUPPORTED		UINT_MAX
 
 #define QCOM_REGMAP_FIELD_ALLOC(d, m, f, mf)    \
 	do { \
@@ -245,6 +246,7 @@ struct lpass_variant {
 	/* SOC specific dais */
 	struct snd_soc_dai_driver *dai_driver;
 	int num_dai;
+	unsigned int hdmi_dai;
 	const char * const *dai_osr_clk_names;
 	const char * const *dai_bit_clk_names;
 

@@ -149,6 +149,7 @@ static struct lpass_variant ipq806x_data = {
 
 	.dai_driver		= &ipq806x_lpass_cpu_dai_driver,
 	.num_dai		= 1,
+	.hdmi_dai		= LPASS_HDMI_DAI_UNSUPPORTED,
 	.dai_osr_clk_names	= (const char *[]) {
 				"mi2s-osr-clk",
 				},
