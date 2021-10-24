@@ -3577,7 +3577,7 @@ static struct gdsc oxili_gx_gdsc_8917 = {
 };
 
 static struct gdsc oxili_cx_gdsc = {
-	.gdscr = 0x5904c,
+	.gdscr = 0x59044,
 	.pd = {
 		.name = "oxili_cx",
 	},
