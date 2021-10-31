@@ -62,7 +62,7 @@
 			no-map;
 		};
 
-		splash_region@90001000 {
+		splash_region@90000000 {
 			reg = <0x0 0x90000000 0x0 0x1400000>;
 			no-map;
 		};
@@ -71,7 +71,7 @@
 			reg = <0x0 0x91400000 0x0 0x700000>;
 			no-map;
 		};
-
+		
 		mba_mem: mba_mem@92000000 {
 			reg = <0x0 0x92000000 0x0 0x100000>;
 			no-map;
@@ -520,11 +520,11 @@
 		};
 
 		areno_smmu: qcom,iommu@1f00000 {
-			compatible = "qcom,msm89x7-smmu-v2", "qcom,adreno-smmu", "qcom,smmu-v2";
+			compatible = "qcom,msm8917-smmu-500", "qcom,adreno-smmu", "arm,mmu-500";
 			reg = <0x1f00000 0x10000>;
 			reg-names = "base";
 			qcom,iommu-secure-id = <18>;
-			#iommu-cells = <1>;
+			#iommu-cells = <2>;
 			#global-interrupts = <0>;
 			#size-cells = <1>;
 			#address-cells = <1>;
@@ -539,7 +539,7 @@
 		};
 
 		apps_smmu: iommu@1e00000 {
-			compatible = "qcom,msm89x7-smmu-500", "qcom,smmu-v2";
+			compatible = "qcom,msm89x7-smmu-500", "arm,mmu-500";
 			reg = <0x1e00000 0x40000>;
 			clocks = <&gcc GCC_SMMU_CFG_CLK>,
 				 <&gcc GCC_APSS_TCU_CLK>;
@@ -733,7 +733,7 @@
 			power-domains = <&gcc OXILI_GX_GDSC>;
 			operating-points-v2 = <&gpu_opp_table>;
 			#cooling-cells = <2>;
-			iommus = <&areno_smmu 0>;
+			iommus = <&areno_smmu 1 2>;
 
 			gpu_opp_table: opp-table {
 				compatible  ="operating-points-v2";
