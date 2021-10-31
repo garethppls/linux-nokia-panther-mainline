@@ -519,7 +519,7 @@
 			reg = <0x01937000 0x30000>;
 		};
 
-		areno_smmu: qcom,iommu@1f00000 {
+		adreno_smmu: qcom,iommu@1f00000 {
 			compatible = "qcom,msm8917-smmu-500", "qcom,adreno-smmu", "arm,mmu-500";
 			reg = <0x1f00000 0x10000>;
 			reg-names = "base";
@@ -733,7 +733,7 @@
 			power-domains = <&gcc OXILI_GX_GDSC>;
 			operating-points-v2 = <&gpu_opp_table>;
 			#cooling-cells = <2>;
-			iommus = <&areno_smmu 1 2>;
+			iommus = <&adreno_smmu 1 2>;
 
 			gpu_opp_table: opp-table {
 				compatible  ="operating-points-v2";
