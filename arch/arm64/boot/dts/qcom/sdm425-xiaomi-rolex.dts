@@ -16,23 +16,6 @@
 		panel = &panel;
 	};
 
-	chosen {
-		bootargs = "earlycon=tty0 console=tty0";
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-		stdout-path = "framebuffer0";
-		framebuffer0: framebuffer@90001000 {
-			compatible = "simple-framebuffer";
-			reg = <0 (0x90001000) 0 (720*1280*3)>;
-			width = <720>;
-			height = <1280>;
-			stride = <(720 * 3)>;
-			format = "r8g8b8";
-			status= "ok";
-		};
-	};
-
 	reserved-memory {
 		/delete-node/other_ext_region@85b00000;
 
@@ -128,33 +111,6 @@
 			function = LED_FUNCTION_INDICATOR;
 			color = <LED_COLOR_ID_BLUE>;
 		};
-		led@3 {
-			reg = <3>;
-			led-max-microamp = <5000>;
-			function = LED_FUNCTION_INDICATOR;
-			color = <LED_COLOR_ID_WHITE>;
-		};
-
-		led@4 {
-			reg = <4>;
-			led-max-microamp = <5000>;
-			function = LED_FUNCTION_INDICATOR;
-			color = <LED_COLOR_ID_YELLOW>;
-		};
-/*
-		led@5 {
-			reg = <5>;
-			led-max-microamp = <5000>;
-			function = LED_FUNCTION_INDICATOR;
-			color = <LED_COLOR_ID_???>; // Cyan
-		};
-*/
-		led@6 {
-			reg = <6>;
-			led-max-microamp = <5000>;
-			function = LED_FUNCTION_INDICATOR;
-			color = <LED_COLOR_ID_VIOLET>;
-		};
 	};
 };
 
@@ -164,11 +120,12 @@
 		compatible = "edt,edt-ft5306", "edt,edt-ft5x06";
 		reg = <0x38>;
 		vcc-supply = <&pm8937_l10>;
+		iovcc-supply = <&pm8937_l5>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&ts_int_active &ts_reset_active>;
 		interrupt-parent = <&msmgpio>;
 		interrupts = <65 0x2008>;
-		reset-gpios = <&msmgpio 64 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&msmgpio 64 GPIO_ACTIVE_LOW>;
 		touchscreen-size-x = <720>;
 		touchscreen-size-y = <1280>;
 	};
