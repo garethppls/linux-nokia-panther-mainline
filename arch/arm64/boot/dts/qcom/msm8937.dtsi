@@ -703,8 +703,8 @@
 			#hwlock-cells = <1>;
 		};
 
-		apps_iommu: iommu@1e00000 {
-			compatible = "qcom,msm8953-smmu-500", "arm,mmu32-500";
+		apps_smmu: iommu@1e00000 {
+			compatible = "qcom,msm89x7-smmu-500", "arm,mmu32-500";
 			reg = <0x1e00000 0x40000>;
 
 			clocks = <&gcc GCC_SMMU_CFG_CLK>,
@@ -750,8 +750,8 @@
 			#iommu-cells = <2>;
 		};
 
-		gpu_iommu: iommu@1c40000 {
-			compatible = "qcom,msm8953-smmu-v2", "qcom,adreno-smmu", "qcom,smmu-v2";
+		adreno_smmu: iommu@1c40000 {
+			compatible = "qcom,msm8937-smmu-v2", "qcom,adreno-smmu", "qcom,smmu-v2";
 			reg = <0x01c40000 0x10000>;
 
 			clocks = <&gcc GCC_OXILI_AHB_CLK>,
@@ -952,7 +952,7 @@
 					      "core",
 					      "vsync";
 
-				iommus = <&apps_iommu 0x2800 0>;
+				iommus = <&apps_smmu 0x2800 0>;
 
 				ports {
 					#address-cells = <1>;
@@ -998,7 +998,7 @@
 			power-domains = <&gcc OXILI_GX_GDSC>;
 			operating-points-v2 = <&gpu_opp_table>;
 			#cooling-cells = <2>;
-			iommus = <&gpu_iommu 0>;
+			iommus = <&adreno_smmu 0>;
 
 			gpu_opp_table: opp-table {
 				compatible  ="operating-points-v2";
