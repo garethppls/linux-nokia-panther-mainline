@@ -4,7 +4,6 @@
 #define _DT_BINDINGS_CLK_QCOM_GCC_MSM8937_H
 
 #define GPLL0_OUT_MAIN			            0
-#define GPLL0_AO_OUT_MAIN			        1
 #define GPLL0_SLEEP_CLK_SRC			        2
 #define GPLL3_OUT_MAIN			            4
 #define GPLL4_OUT_MAIN			            5

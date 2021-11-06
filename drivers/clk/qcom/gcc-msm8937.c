@@ -70,22 +70,14 @@ static struct clk_alpha_pll gpll0_out_main = {
 	},
 };
 
-static struct clk_alpha_pll gpll0_ao_out_main = {
-	.offset = 0x21000,
-	.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
-	.flags = SUPPORTS_FSM_MODE,
-	.clkr = {
-		.enable_reg = 0x45000,
-		.enable_mask = BIT(0),
-		.hw.init = &(struct clk_init_data){
-			.name = "gpll0_ao_out_main",
-			.parent_data = &(const struct clk_parent_data) {
-				.fw_name = "xo", .name = "xo",
-			},
-			.num_parents = 1,
-			.flags = CLK_IS_CRITICAL,
-			.ops = &clk_alpha_pll_fixed_ops,
-		},
+static struct clk_fixed_factor gpll0_out_aux = {
+	.mult = 1,
+	.div = 1,
+	.hw.init = &(struct clk_init_data){
+		.name = "gpll0_out_aux",
+		.parent_names = (const char *[]){ "gpll0_out_main" },
+		.num_parents = 1,
+		.ops = &clk_fixed_factor_ops,
 	},
 };
 
@@ -1011,7 +1003,7 @@ static const struct parent_map gcc_parent_map_6[] = {
 
 static const struct clk_parent_data gcc_parent_data_6[] = {
 	{ .fw_name = "xo", .name = "xo" },
-	{ .hw = &gpll0_ao_out_main.clkr.hw },
+	{ .hw = &gpll0_out_aux.hw },
 };
 
 static const struct freq_tbl ftbl_cci_clk_src[] = {
@@ -1140,7 +1132,7 @@ static const struct parent_map gcc_parent_map_8[] = {
 static const struct clk_parent_data gcc_parent_data_8[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
-	{ .hw = &gpll0_ao_out_main.clkr.hw },
+	{ .hw = &gpll0_out_aux.hw },
 	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
 };
 
@@ -1168,7 +1160,7 @@ static const struct parent_map gcc_parent_map_9[] = {
 static const struct clk_parent_data gcc_parent_data_9[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
-	{ .hw = &gpll0_ao_out_main.clkr.hw },
+	{ .hw = &gpll0_out_aux.hw },
 	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
 };
 
@@ -1196,7 +1188,7 @@ static const struct parent_map gcc_parent_map_10[] = {
 static const struct clk_parent_data gcc_parent_data_10[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
-	{ .hw = &gpll0_ao_out_main.clkr.hw },
+	{ .hw = &gpll0_out_aux.hw },
 	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
 };
 
@@ -1224,7 +1216,7 @@ static const struct parent_map gcc_parent_map_11[] = {
 static const struct clk_parent_data gcc_parent_data_11[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
-	{ .hw = &gpll0_ao_out_main.clkr.hw },
+	{ .hw = &gpll0_out_aux.hw },
 	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
 };
 
@@ -1307,7 +1299,7 @@ static struct clk_rcg2 gfx3d_clk_src = {
 		.name = "gfx3d_clk_src",
 		.parent_data = gcc_parent_data_12,
 		.num_parents = 4,
-		.flags = CLK_SET_RATE_PARENT,
+		.flags = CLK_SET_RATE_PARENT | CLK_OPS_PARENT_ENABLE,
 		.ops = &clk_rcg2_ops,
 	},
 };
@@ -1365,7 +1357,7 @@ static const struct parent_map gcc_parent_map_14[] = {
 static const struct clk_parent_data gcc_parent_data_14[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi0pll", .name = "dsi0pll" },
-	{ .hw = &gpll0_ao_out_main.clkr.hw },
+	{ .hw = &gpll0_out_aux.hw },
 	{ .fw_name = "dsi1pll", .name = "dsi1pll" },
 };
 
@@ -1393,7 +1385,7 @@ static const struct parent_map gcc_parent_map_15[] = {
 static const struct clk_parent_data gcc_parent_data_15[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi1pll", .name = "dsi1pll" },
-	{ .hw = &gpll0_ao_out_main.clkr.hw },
+	{ .hw = &gpll0_out_aux.hw },
 	{ .fw_name = "dsi0pll", .name = "dsi0pll" },
 };
 
@@ -3523,9 +3515,12 @@ static struct gdsc oxili_cx_gdsc = {
 	.pwrsts = PWRSTS_OFF_ON,
 };
 
+static struct clk_hw *gcc_msm8937_hws[] = {
+	&gpll0_out_aux.hw,
+};
+
 static struct clk_regmap *gcc_msm8937_clocks[] = {
 	[GPLL0_OUT_MAIN] = &gpll0_out_main.clkr,
-	[GPLL0_AO_OUT_MAIN] = &gpll0_ao_out_main.clkr,
 	[GPLL0_SLEEP_CLK_SRC] = &gpll0_sleep_clk_src.clkr,
 	[GPLL3_OUT_MAIN] = &gpll3_out_main.clkr,
 	[GPLL4_OUT_MAIN] = &gpll4_out_main.clkr,
@@ -3744,6 +3739,8 @@ static const struct qcom_cc_desc gcc_msm8937_desc = {
 	.num_resets = ARRAY_SIZE(gcc_msm8937_resets),
 	.gdscs = gcc_msm8937_gdscs,
 	.num_gdscs = ARRAY_SIZE(gcc_msm8937_gdscs),
+	.clk_hws = gcc_msm8937_hws,
+	.num_clk_hws = ARRAY_SIZE(gcc_msm8937_hws),
 };
 
 static void fixup_for_msm8917(struct platform_device *pdev,

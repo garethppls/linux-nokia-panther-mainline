@@ -713,15 +713,6 @@
 			reg-names = "kgsl_3d0_reg_memory";
 			interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "kgsl_3d0_irq";
-			clocks = <&gcc GCC_OXILI_GFX3D_CLK>,
-				 <&gcc GCC_OXILI_AHB_CLK>,
-				 <&gcc GCC_BIMC_GFX_CLK>,
-				 <&gcc GCC_BIMC_GPU_CLK>,
-				 <&gcc GCC_GTCU_AHB_CLK>,
-				 <&gcc GCC_GFX_TCU_CLK>,
-				 <&gcc GCC_GFX_TBU_CLK>,
-				 <&rpmcc RPM_SMD_BIMC_GPU_CLK>;
-
 			clock-names = "core", 
 						  "iface", 
 						  "mem_iface",
@@ -729,7 +720,15 @@
 						  "gtcu_iface",
 						  "gtcu", 
 						  "gtbu",
-						  "bimc_gpu";
+						  "gfx3d";
+			clocks = <&gcc GCC_OXILI_GFX3D_CLK>,
+				 <&gcc GCC_OXILI_AHB_CLK>,
+				 <&gcc GCC_BIMC_GFX_CLK>,
+				 <&gcc GCC_BIMC_GPU_CLK>,
+				 <&gcc GCC_GTCU_AHB_CLK>,
+				 <&gcc GCC_GFX_TCU_CLK>,
+				 <&gcc GCC_GFX_TBU_CLK>,
+				 <&gcc GFX3D_CLK_SRC>;
 			power-domains = <&gcc OXILI_GX_GDSC>;
 			operating-points-v2 = <&gpu_opp_table>;
 			#cooling-cells = <2>;
