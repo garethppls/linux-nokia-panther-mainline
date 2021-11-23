@@ -183,7 +183,8 @@
 #define GCC_GFX_TCU_CLK			            179
 #define GCC_GFX_TBU_CLK			            180
 #define GCC_GTCU_AHB_CLK		            181
-#define GCC_IPA_TBU_CLK		                182
+#define GCC_OXILI_GMEM_CLK		            182
+#define GCC_IPA_TBU_CLK		                183
 
 /* GCC resets */
 #define GCC_CAMSS_MICRO_BCR			0
