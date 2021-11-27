@@ -195,6 +195,13 @@ config MSM_GCC_8937
 	  Say Y if you want to use devices such as UART, SPI i2c, USB,
 	  SD/eMMC, display, graphics, camera etc.
 
+config MSM_GCC_8937_DEBUG
+	tristate "MSM8937 GCC Debug"
+	depends on DEBUG_FS
+	depends on MSM_GCC_8937
+	help
+	  Support for the measuring clock rates on MSM8937 GCC.
+
 config MSM_GCC_8939
 	tristate "MSM8939 Global Clock Controller"
 	select QCOM_GDSC

@@ -480,6 +480,10 @@
 			clock-names = "xo";
 		};
 
+		clock-debugger {
+    		compatible = "qcom,gcc-msm8937-debug";
+  		};
+
 		saw: syscon@b012000 {
 			compatible = "syscon";
 			reg = <0xb012000 0x1000>;

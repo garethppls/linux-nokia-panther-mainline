@@ -5,6 +5,7 @@
  */
 
 #include <linux/irq.h>
+#include <linux/clk.h>
 
 #include <drm/drm_print.h>
 #include <drm/drm_vblank.h>
@@ -34,6 +35,7 @@ static void mdp5_irq_error_handler(struct mdp_irq *irq, uint32_t irqstatus)
 		if (mdp5_kms->smp)
 			mdp5_smp_dump(mdp5_kms->smp, &p);
 	}
+	gcc_debug_measure_all();
 }
 
 void mdp5_irq_preinstall(struct msm_kms *kms)

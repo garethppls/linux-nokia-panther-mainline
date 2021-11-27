@@ -783,6 +783,8 @@ int clk_save_context(void);
  */
 void clk_restore_context(void);
 
+void gcc_debug_measure_all(void);
+
 #else /* !CONFIG_HAVE_CLK */
 
 static inline struct clk *clk_get(struct device *dev, const char *id)
