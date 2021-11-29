@@ -136,10 +136,7 @@
 		compatible = "mdss,nt35521s-ebbg";
 		reg = <0>;
 		
-		backlight = <&backlight>;
-		vsp-supply = <&reg_lcd_pos>;
-		vsn-supply = <&reg_lcd_neg>;
-		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_LOW>;
 		
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&mdss_dsi_active &mdss_te_active>;

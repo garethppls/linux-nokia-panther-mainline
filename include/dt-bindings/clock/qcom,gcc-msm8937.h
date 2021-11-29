@@ -3,12 +3,13 @@
 #ifndef _DT_BINDINGS_CLK_QCOM_GCC_MSM8937_H
 #define _DT_BINDINGS_CLK_QCOM_GCC_MSM8937_H
 
-#define GPLL0_OUT_MAIN			            0
-#define GPLL0_SLEEP_CLK_SRC			        2
-#define GPLL3_OUT_MAIN			            4
-#define GPLL4_OUT_MAIN			            5
-#define GPLL6			                    6
-#define GPLL6_OUT_AUX			            7
+#define GPLL0					            0
+#define GPLL0_VOTE				            1
+#define GPLL3_OUT_MAIN			            2
+#define GPLL4					            3
+#define GPLL4_VOTE				            4
+#define GPLL6					            5
+#define GPLL6_VOTE				            6
 #define APSS_AHB_CLK_SRC			        8
 #define BLSP1_QUP1_I2C_APPS_CLK_SRC			9
 #define BLSP1_QUP1_SPI_APPS_CLK_SRC			10
