@@ -1127,12 +1127,12 @@ DEFINE_CLK_SMD_RPM(msm8937, snoc_clk, snoc_a_clk, QCOM_SMD_RPM_BUS_CLK, 1);
 DEFINE_CLK_SMD_RPM(msm8937, bimc_clk, bimc_a_clk, QCOM_SMD_RPM_MEM_CLK, 0);
 DEFINE_CLK_SMD_RPM(msm8937, sysmmnoc_clk, sysmmnoc_a_clk, QCOM_SMD_RPM_BUS_CLK, 2);
 DEFINE_CLK_SMD_RPM_QDSS(msm8937, qdss_clk, qdss_a_clk, QCOM_SMD_RPM_MISC_CLK, 1);
-DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, bb_clk1, bb_clk1_a, 1);
-DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, bb_clk2, bb_clk2_a, 2);
-DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, rf_clk2, rf_clk2_a, 5);
-DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, div_clk2, div_clk2_a, 0xc);
-DEFINE_CLK_SMD_RPM_XO_BUFFER_PINCTRL(msm8937, bb_clk1_pin, bb_clk1_a_pin, 1);
-DEFINE_CLK_SMD_RPM_XO_BUFFER_PINCTRL(msm8937, bb_clk2_pin, bb_clk2_a_pin, 2);
+DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, bb_clk1, bb_clk1_a, 1, 19200000);
+DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, bb_clk2, bb_clk2_a, 2, 19200000);
+DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, rf_clk2, rf_clk2_a, 5, 19200000);
+DEFINE_CLK_SMD_RPM_XO_BUFFER(msm8937, div_clk2, div_clk2_a, 0xc, 19200000);
+DEFINE_CLK_SMD_RPM_XO_BUFFER_PINCTRL(msm8937, bb_clk1_pin, bb_clk1_a_pin, 1, 19200000);
+DEFINE_CLK_SMD_RPM_XO_BUFFER_PINCTRL(msm8937, bb_clk2_pin, bb_clk2_a_pin, 2, 19200000);
 static struct clk_smd_rpm *msm8937_clks[] = {
 	[RPM_SMD_XO_CLK_SRC] = &msm8937_xo_clk_src,
 	[RPM_SMD_XO_A_CLK_SRC] = &msm8937_xo_a_clk_src,
