@@ -655,7 +655,7 @@ static struct qcom_icc_node slv_tlmm = {
 	.id = MSM8937_SLAVE_TLMM,
 	.buswidth = 4,
 	.mas_rpm_id = -1,
-	.slv_rpm_id = 214,
+	.slv_rpm_id = 51,
 };
 
 static struct qcom_icc_node slv_message_ram = {
@@ -1121,11 +1121,8 @@ static struct qcom_icc_node mas_jpeg = {
 	.name = "mas_jpeg",
 	.id = MSM8937_MASTER_JPEG,
 	.buswidth = 16,
-	.mas_rpm_id = 7,
+	.mas_rpm_id = -1,
 	.slv_rpm_id = -1,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_BYPASS,
-	.qos.qos_port = 6,
 	.num_links = ARRAY_SIZE(mas_jpeg_links),
 	.links = mas_jpeg_links,
 };
@@ -1138,11 +1135,8 @@ static struct qcom_icc_node mas_mdp = {
 	.name = "mas_mdp",
 	.id = MSM8937_MASTER_MDP_PORT0,
 	.buswidth = 16,
-	.mas_rpm_id = 8,
+	.mas_rpm_id = -1,
 	.slv_rpm_id = -1,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_BYPASS,
-	.qos.qos_port = 7,
 	.num_links = ARRAY_SIZE(mas_mdp_links),
 	.links = mas_mdp_links,
 };
@@ -1155,11 +1149,8 @@ static struct qcom_icc_node mas_venus = {
 	.name = "mas_venus",
 	.id = MSM8937_MASTER_VIDEO_P0,
 	.buswidth = 16,
-	.mas_rpm_id = 9,
+	.mas_rpm_id = -1,
 	.slv_rpm_id = -1,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_BYPASS,
-	.qos.qos_port = 8,
 	.num_links = ARRAY_SIZE(mas_venus_links),
 	.links = mas_venus_links,
 };
@@ -1172,11 +1163,8 @@ static struct qcom_icc_node mas_vfe0 = {
 	.name = "mas_vfe0",
 	.id = MSM8937_MASTER_VFE,
 	.buswidth = 16,
-	.mas_rpm_id = 11,
+	.mas_rpm_id = -1,
 	.slv_rpm_id = -1,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_BYPASS,
-	.qos.qos_port = 9,
 	.num_links = ARRAY_SIZE(mas_vfe0_links),
 	.links = mas_vfe0_links,
 };
@@ -1189,11 +1177,8 @@ static struct qcom_icc_node mas_vfe1 = {
 	.name = "mas_vfe1",
 	.id = MSM8937_MASTER_VFE1,
 	.buswidth = 16,
-	.mas_rpm_id = 133,
+	.mas_rpm_id = -1,
 	.slv_rpm_id = -1,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_BYPASS,
-	.qos.qos_port = 13,
 	.num_links = ARRAY_SIZE(mas_vfe1_links),
 	.links = mas_vfe1_links,
 };
@@ -1207,11 +1192,8 @@ static struct qcom_icc_node mas_cpp = {
 	.name = "mas_cpp",
 	.id = MSM8937_MASTER_CPP,
 	.buswidth = 16,
-	.mas_rpm_id = 115,
+	.mas_rpm_id = -1,
 	.slv_rpm_id = -1,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_BYPASS,
-	.qos.qos_port = 12,
 	.num_links = ARRAY_SIZE(mas_cpp_links),
 	.links = mas_cpp_links,
 };
@@ -1225,9 +1207,7 @@ static struct qcom_icc_node slv_snoc_bimc_0 = {
 	.id = MSM8937_SNOC_BIMC_0_SLV,
 	.buswidth = 8,
 	.mas_rpm_id = -1,
-	.slv_rpm_id = 24,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_INVALID,
+	.slv_rpm_id = -1,
 	.num_links = ARRAY_SIZE(slv_snoc_bimc_0_links),
 	.links = slv_snoc_bimc_0_links,
 };
@@ -1241,9 +1221,7 @@ static struct qcom_icc_node slv_snoc_bimc_2 = {
 	.id = MSM8937_SNOC_BIMC_2_SLV,
 	.buswidth = 8,
 	.mas_rpm_id = -1,
-	.slv_rpm_id = 137,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_INVALID,
+	.slv_rpm_id = -1,
 	.num_links = ARRAY_SIZE(slv_snoc_bimc_2_links),
 	.links = slv_snoc_bimc_2_links,
 };
@@ -1253,9 +1231,7 @@ static struct qcom_icc_node slv_cats_0 = {
 	.id = MSM8937_SLAVE_CATS_128,
 	.buswidth = 16,
 	.mas_rpm_id = -1,
-	.slv_rpm_id = 106,
-	.qos.ap_owned = true,
-	.qos.qos_mode = NOC_QOS_MODE_INVALID,
+	.slv_rpm_id = -1,
 };
 
 static struct qcom_icc_node *msm8937_sysmmnoc_nodes[] = {
@@ -1270,19 +1246,9 @@ static struct qcom_icc_node *msm8937_sysmmnoc_nodes[] = {
 	[SLV_CATS_0] = &slv_cats_0,
 };
 
-static const struct regmap_config msm8937_sysmmnoc_regmap_config = {
-	.reg_bits	= 32,
-	.reg_stride	= 4,
-	.val_bits	= 32,
-	.max_register	= 0x16080,
-	.fast_io	= true,
-};
-
 static struct qcom_icc_desc msm8937_sysmmnoc = {
 	.nodes = msm8937_sysmmnoc_nodes,
 	.num_nodes = ARRAY_SIZE(msm8937_sysmmnoc_nodes),
-	.regmap_cfg = &msm8937_sysmmnoc_regmap_config,
-	.qos_offset = 0x7000,
 };
 
 static const struct of_device_id msm8937_noc_of_match[] = {

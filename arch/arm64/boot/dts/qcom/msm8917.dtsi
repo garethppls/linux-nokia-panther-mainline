@@ -526,6 +526,42 @@
 			#thermal-sensor-cells = <1>;
 		};
 
+		bimc: interconnect-bimc@400000 {
+			compatible = "qcom,msm8937-bimc";
+			reg = <0x400000 0x5A000>;
+			clock-names = "bus", "bus_a";
+			clocks = <&rpmcc RPM_SMD_BIMC_CLK>,
+				 <&rpmcc RPM_SMD_BIMC_A_CLK>;
+			#interconnect-cells = <1>;
+		};
+
+		pcnoc: interconnect-pcnoc@500000 {
+			compatible = "qcom,msm8937-pcnoc";
+			reg = <0x500000 0x13080>;
+			clock-names = "bus", "bus_a";
+			clocks = <&rpmcc RPM_SMD_PCNOC_CLK>,
+				 <&rpmcc RPM_SMD_PCNOC_A_CLK>;
+			#interconnect-cells = <1>;
+		};
+
+		snoc: interconnect-snoc@580000 {
+			compatible = "qcom,msm8937-snoc";
+			reg = <0x580000 0x16080>;
+			clock-names = "bus", "bus_a";
+			clocks = <&rpmcc RPM_SMD_SNOC_CLK>,
+				 <&rpmcc RPM_SMD_SNOC_A_CLK>;
+			#interconnect-cells = <1>;
+		};
+
+		sysmmnoc: interconnect-snoc-mm@580000 {
+			compatible = "qcom,msm8937-sysmmnoc";
+			reg = <0x580000 0x16080>;
+			clock-names = "bus", "bus_a";
+			clocks = <&rpmcc RPM_SMD_SYSMMNOC_CLK>,
+				 <&rpmcc RPM_SMD_SYSMMNOC_A_CLK>;
+			#interconnect-cells = <1>;
+		};
+
 		msmgpio: pinctrl@1000000 {
 			compatible = "qcom,msm8917-pinctrl";
 			reg = <0x01000000 0x300000>;
