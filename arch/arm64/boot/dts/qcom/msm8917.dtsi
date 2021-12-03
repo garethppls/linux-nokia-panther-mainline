@@ -91,8 +91,8 @@
 			clocks = <&apcs>;
 			#cooling-cells = <2>;
 			operating-points-v2 = <&cluster0_opp_table>;
-			power-domains = <&cpr>;
-			power-domain-names = "cpr";
+			power-domains = <&cpr>, <&CPU_PD0>;
+			power-domain-names = "cpr", "psci";
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 			L2_0: l2-cache {
@@ -111,8 +111,8 @@
 			clocks = <&apcs>;
 			#cooling-cells = <2>;
 			operating-points-v2 = <&cluster0_opp_table>;
-			power-domains = <&cpr>;
-			power-domain-names = "cpr";
+			power-domains = <&cpr>, <&CPU_PD1>;
+			power-domain-names = "cpr", "psci";
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 		};
@@ -127,8 +127,8 @@
 			clocks = <&apcs>;
 			#cooling-cells = <2>;
 			operating-points-v2 = <&cluster0_opp_table>;
-			power-domains = <&cpr>;
-			power-domain-names = "cpr";
+			power-domains = <&cpr>, <&CPU_PD2>;
+			power-domain-names = "cpr", "psci";
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 		};
@@ -143,8 +143,8 @@
 			clocks = <&apcs>;
 			#cooling-cells = <2>;
 			operating-points-v2 = <&cluster0_opp_table>;
-			power-domains = <&cpr>;
-			power-domain-names = "cpr";
+			power-domains = <&cpr>, <&CPU_PD3>;
+			power-domain-names = "cpr", "psci";
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 		};
@@ -163,6 +163,45 @@
 				core3 {
 					cpu = <&CPU3>;
 				};
+			};
+		};
+
+		idle-states {
+			entry-method = "psci";
+			CPU_SLEEP: cpu-sleep {
+				compatible = "arm,idle-state";
+				idle-state-name = "standalone-power-collapse";
+				arm,psci-suspend-param = <0x40000003>;
+				entry-latency-us = <125>;
+				exit-latency-us = <180>;
+				min-residency-us = <595>;
+				local-timer-stop;
+			};
+		};
+
+		domain-idle-states {
+			CLUSTER_PWRDN: cluster-gdhs {
+				compatible = "domain-idle-state";
+				arm,psci-suspend-param = <0x41000043>;
+				entry-latency-us = <240>;
+				exit-latency-us = <280>;
+				min-residency-us = <806>;
+			};
+
+			CLUSTER_RET: cluster-retention {
+				compatible = "domain-idle-state";
+				arm,psci-suspend-param = <0x41000023>;
+				entry-latency-us = <700>;
+				exit-latency-us = <650>;
+				min-residency-us = <1972>;
+			};
+
+			CLUSTER_PC: cluster-power-collapse {
+				compatible = "domain-idle-state";
+				arm,psci-suspend-param = <0x41000053>;
+				entry-latency-us = <700>;
+				exit-latency-us = <1000>;
+				min-residency-us = <6500>;
 			};
 		};
 	};
@@ -275,6 +314,35 @@
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
+
+		CPU_PD0: power-domain-cpu0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+			domain-idle-states = <&CPU_SLEEP>;
+		};
+
+		CPU_PD1: power-domain-cpu1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+			domain-idle-states = <&CPU_SLEEP>;
+		};
+
+		CPU_PD2: power-domain-cpu2 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+			domain-idle-states = <&CPU_SLEEP>;
+		};
+
+		CPU_PD3: power-domain-cpu3 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+			domain-idle-states = <&CPU_SLEEP>;
+		};
+
+		CLUSTER_PD: power-domain-cluster {
+			#power-domain-cells = <0>;
+			domain-idle-states = <&CLUSTER_PWRDN>, <&CLUSTER_RET>, <&CLUSTER_PC>;
+		};
 	};
 
 	smd {
