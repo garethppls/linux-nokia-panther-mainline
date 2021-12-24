@@ -66,18 +66,17 @@ static struct clk_regmap gpll0_vote = {
 	},
 };
 
-/* 750MHz configuration */
 static const struct alpha_pll_config gpll3_config = {
-	.l = 0x27,
+	.l = 48,
 	.alpha = 0x0,
-	.alpha_hi = 0x10,
 	.alpha_en_mask = BIT(24),
-	.post_div_mask = 0xf << 8,
-	.post_div_val = 0x1 << 8,
+	.early_output_mask = 0,
+	.post_div_mask = GENMASK(11, 8),
+	.post_div_val = BIT(8),
 	.vco_mask = 0x3 << 20,
 	.main_output_mask = 0x1,
 	.config_ctl_val = 0x4001055b,
-	.test_ctl_hi_val = 0x40000600,
+	
 };
 
 static struct pll_vco gpll3_vco_8937[] = {
@@ -88,13 +87,13 @@ static struct pll_vco gpll3_vco_8917[] = {
 	{ 700000000, 1400000000, 0 },
 };
 
-static struct clk_alpha_pll gpll3_out_main = {
+static struct clk_alpha_pll gpll3 = {
 	.offset = 0x22000,
 	.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
 	.vco_table = gpll3_vco_8937,
 	.num_vco = ARRAY_SIZE(gpll3_vco_8937),
 	.clkr.hw.init = &(struct clk_init_data){
-		.name = "gpll3_out_main",
+		.name = "gpll3",
 		.parent_data = &(const struct clk_parent_data) {
 			.fw_name = "xo", .name = "xo",
 		},
@@ -594,7 +593,7 @@ static struct clk_rcg2 sdcc2_apps_clk_src = {
 		.name = "sdcc2_apps_clk_src",
 		.parent_data = gcc_parent_data_0,
 		.num_parents = ARRAY_SIZE(gcc_parent_data_0),
-		.ops = &clk_rcg2_ops,
+		.ops = &clk_rcg2_floor_ops,
 	},
 };
 
@@ -1116,14 +1115,12 @@ static struct clk_rcg2 vfe1_clk_src = {
 static const struct parent_map gcc_parent_map_7[] = {
 	{ P_XO, 0 },
 	{ P_DSI0_PHYPLL_BYTE, 1 },
-	{ P_GPLL0_AUX, 2 },
 	{ P_DSI1_PHYPLL_BYTE, 3 },
 };
 
 static const struct clk_parent_data gcc_parent_data_7[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
-	{ .hw = &gpll0_vote.hw },
 	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
 };
 
@@ -1143,16 +1140,12 @@ static struct clk_rcg2 byte0_clk_src = {
 
 static const struct parent_map gcc_parent_map_8[] = {
 	{ P_XO, 0 },
-	{ P_DSI0_PHYPLL_BYTE, 2 },
 	{ P_GPLL0_AUX, 3 },
-	{ P_DSI1_PHYPLL_BYTE, 4 },
 };
 
 static const struct clk_parent_data gcc_parent_data_8[] = {
 	{ .fw_name = "xo", .name = "xo" },
-	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
 	{ .hw = &gpll0_vote.hw },
-	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
 };
 
 static struct clk_rcg2 esc0_clk_src = {
@@ -1172,14 +1165,12 @@ static struct clk_rcg2 esc0_clk_src = {
 static const struct parent_map gcc_parent_map_9[] = {
 	{ P_XO, 0 },
 	{ P_DSI1_PHYPLL_BYTE, 1 },
-	{ P_GPLL0_AUX, 2 },
 	{ P_DSI0_PHYPLL_BYTE, 3 },
 };
 
 static const struct clk_parent_data gcc_parent_data_9[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
-	{ .hw = &gpll0_vote.hw },
 	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
 };
 
@@ -1199,16 +1190,12 @@ static struct clk_rcg2 byte1_clk_src = {
 
 static const struct parent_map gcc_parent_map_10[] = {
 	{ P_XO, 0 },
-	{ P_DSI1_PHYPLL_BYTE, 2 },
 	{ P_GPLL0_AUX, 3 },
-	{ P_DSI0_PHYPLL_BYTE, 4 },
 };
 
 static const struct clk_parent_data gcc_parent_data_10[] = {
 	{ .fw_name = "xo", .name = "xo" },
-	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
 	{ .hw = &gpll0_vote.hw },
-	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
 };
 
 static struct clk_rcg2 esc1_clk_src = {
@@ -1235,7 +1222,7 @@ static const struct parent_map gcc_parent_map_11[] = {
 static const struct clk_parent_data gcc_parent_data_11[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .hw = &gpll0_vote.hw },
-	{ .hw = &gpll3_out_main.clkr.hw },
+	{ .hw = &gpll3.clkr.hw },
 	{ .hw = &gpll6_vote.hw },
 };
 
@@ -1298,17 +1285,13 @@ static struct clk_rcg2 gfx3d_clk_src = {
 static const struct parent_map gcc_parent_map_12[] = {
 	{ P_XO, 0 },
 	{ P_GPLL6_AUX, 3 },
-	{ P_DSI1_PHYPLL_BYTE, 2 },
 	{ P_GPLL0, 1 },
-	{ P_DSI0_PHYPLL_BYTE, 4 },
 };
 
 static const struct clk_parent_data gcc_parent_data_12[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .hw = &gpll6_vote.hw },
-	{ .fw_name = "dsi0pllbyte", .name = "dsi0pllbyte" },
 	{ .hw = &gpll0_vote.hw },
-	{ .fw_name = "dsi1pllbyte", .name = "dsi1pllbyte" },
 };
 
 static const struct freq_tbl ftbl_mdp_clk_src[] = {
@@ -1341,14 +1324,12 @@ static struct clk_rcg2 mdp_clk_src = {
 static const struct parent_map gcc_parent_map_13[] = {
 	{ P_XO, 0 },
 	{ P_DSI0_PHYPLL_DSI, 1 },
-	{ P_GPLL0_AUX, 2 },
 	{ P_DSI1_PHYPLL_DSI, 3 },
 };
 
 static const struct clk_parent_data gcc_parent_data_13[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi0pll", .name = "dsi0pll" },
-	{ .hw = &gpll0_vote.hw },
 	{ .fw_name = "dsi1pll", .name = "dsi1pll" },
 };
 
@@ -1369,14 +1350,12 @@ static struct clk_rcg2 pclk0_clk_src = {
 static const struct parent_map gcc_parent_map_14[] = {
 	{ P_XO, 0 },
 	{ P_DSI1_PHYPLL_DSI, 1 },
-	{ P_GPLL0_AUX, 2 },
 	{ P_DSI0_PHYPLL_DSI, 3 },
 };
 
 static const struct clk_parent_data gcc_parent_data_14[] = {
 	{ .fw_name = "xo", .name = "xo" },
 	{ .fw_name = "dsi1pll", .name = "dsi1pll" },
-	{ .hw = &gpll0_vote.hw },
 	{ .fw_name = "dsi0pll", .name = "dsi0pll" },
 };
 
@@ -1432,7 +1411,7 @@ static struct clk_rcg2 sdcc1_apps_clk_src = {
 		.name = "sdcc1_apps_clk_src",
 		.parent_data = gcc_parent_data_15,
 		.num_parents = ARRAY_SIZE(gcc_parent_data_15),
-		.ops = &clk_rcg2_ops,
+		.ops = &clk_rcg2_floor_ops,
 	},
 };
 
@@ -3527,7 +3506,7 @@ static struct gdsc oxili_cx_gdsc = {
 static struct clk_regmap *gcc_msm8937_clocks[] = {
 	[GPLL0] = &gpll0.clkr,
 	[GPLL0_VOTE] = &gpll0_vote,
-	[GPLL3_OUT_MAIN] = &gpll3_out_main.clkr,
+	[GPLL3] = &gpll3.clkr,
 	[GPLL4] = &gpll4.clkr,
 	[GPLL4_VOTE] = &gpll4_vote,
 	[GPLL6] = &gpll6.clkr,
@@ -3751,8 +3730,8 @@ static const struct qcom_cc_desc gcc_msm8937_desc = {
 static void fixup_for_msm8917(struct platform_device *pdev,
 	struct regmap *regmap)
 {
-	gpll3_out_main.vco_table = gpll3_vco_8917;
-	gpll3_out_main.num_vco = ARRAY_SIZE(gpll3_vco_8917);
+	gpll3.vco_table = gpll3_vco_8917;
+	gpll3.num_vco = ARRAY_SIZE(gpll3_vco_8917);
 	vfe0_clk_src.freq_tbl = ftbl_vfe0_clk_src_8917;
 	vfe1_clk_src.freq_tbl = ftbl_vfe0_clk_src_8917;
 	cpp_clk_src.freq_tbl = ftbl_cpp_clk_src_8917;
@@ -3815,8 +3794,6 @@ static int gcc_msm8937_probe(struct platform_device *pdev)
 		return PTR_ERR(regmap);
 
 	if (of_device_is_compatible(pdev->dev.of_node, "qcom,gcc-msm8917")) {
-		regmap_update_bits(regmap, gcc_oxili_gmem_clk.clkr.enable_reg,
-				0xff0, 0xff0);
 		fixup_for_msm8917(pdev, regmap);
 	} else {
 		/* Configure Sleep and Wakeup cycles for OXILI clock */
@@ -3831,7 +3808,7 @@ static int gcc_msm8937_probe(struct platform_device *pdev)
 	if(of_device_is_compatible(pdev->dev.of_node, "qcom,gcc-msm8940"))
 		gcc_msm8937_desc.clks[GCC_IPA_TBU_CLK] = &gcc_ipa_tbu_clk.clkr;
 
-	clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_config);
+	clk_alpha_pll_configure(&gpll3, regmap, &gpll3_config);
 
 	dev_info(&pdev->dev, "Registered GCC clocks\n");
 	return qcom_cc_really_probe(pdev, &gcc_msm8937_desc, regmap);

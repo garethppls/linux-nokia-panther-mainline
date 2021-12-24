@@ -5,7 +5,7 @@
 
 #define GPLL0								0
 #define GPLL0_VOTE							1
-#define GPLL3_OUT_MAIN						2
+#define GPLL3                               2
 #define GPLL4								3
 #define GPLL4_VOTE							4
 #define GPLL6								5
