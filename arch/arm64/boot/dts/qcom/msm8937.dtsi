@@ -396,14 +396,10 @@
 			     	 "operating-points-v2-kryo-cpu";
 		nvmem-cells = <&cpr_efuse_speedbin>;
 		opp-shared;
-		opp-729600000 {
-			opp-hz = /bits/ 64 <729600000>;
-			required-opps = <&cpr_opp1>;
-			opp-suspend;
-		};
 		opp-960000000 {
 			opp-hz = /bits/ 64 <960000000>;
 			required-opps = <&cpr_opp1>;
+			opp-suspend;
 		};
 		opp-1094400000 {
 			opp-hz = /bits/ 64 <1094400000>;
@@ -417,8 +413,8 @@
 			opp-hz = /bits/ 64 <1344000000>;
 			required-opps = <&cpr_opp3>;
 		};
-		opp-1459200000 {
-			opp-hz = /bits/ 64 <1459200000>;
+		opp-1401000000 {
+			opp-hz = /bits/ 64 <1401000000>;
 			required-opps = <&cpr_opp3>;
 		};
 	};
