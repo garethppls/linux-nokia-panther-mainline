@@ -761,7 +761,7 @@
 			compatible = "qcom,msm8937-apcs-kpss-global", "syscon";
 			reg = <0xb011000 0x1000>;
 			#mbox-cells = <1>;
-			clocks = <&a53pll_c1>, <&gcc GPLL0_VOTE>;
+			clocks = <&a53pll_c1>, <&gcc GPLL0_OUT_MAIN>;
 			clock-names = "pll", "aux";
 			#clock-cells = <0>;
 			clock-output-names = "a53mux_c1";
@@ -780,7 +780,7 @@
 			compatible = "qcom,msm8937-apcs-kpss-global", "syscon";
 			reg = <0xb111000 0x1000>;
 			#mbox-cells = <1>;
-			clocks = <&a53pll_c0>, <&gcc GPLL0_VOTE>;
+			clocks = <&a53pll_c0>, <&gcc GPLL0_OUT_MAIN>;
 			clock-names = "pll", "aux";
 			#clock-cells = <0>;
 			clock-output-names = "a53mux_c0";
@@ -800,7 +800,7 @@
 			compatible = "qcom,msm8937-apcs-kpss-global", "syscon";
 			reg = <0xb1d1000 0x1000>;
 			#mbox-cells = <1>;
-			clocks = <&a53pll_cci>, <&gcc GPLL0_VOTE>;
+			clocks = <&a53pll_cci>, <&gcc GPLL0_OUT_MAIN>;
 			clock-names = "pll", "aux";
 			#clock-cells = <0>;
 			status = "disabled";

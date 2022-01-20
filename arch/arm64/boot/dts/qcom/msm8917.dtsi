@@ -606,7 +606,7 @@
 			compatible = "qcom,msm8917-apcs-kpss-global", "syscon";
 			reg = <0xb011000 0x1000>;
 			#mbox-cells = <1>;
-			clocks = <&a53pll>, <&gcc GPLL0_VOTE>;
+			clocks = <&a53pll>, <&gcc GPLL0_OUT_MAIN>;
 			clock-names = "pll", "aux";
 			#clock-cells = <0>;
 		};
