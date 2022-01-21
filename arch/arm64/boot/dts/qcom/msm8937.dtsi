@@ -21,10 +21,10 @@
 
 	chosen { };
 
-	memory {
+	memory@80000000 {
 		device_type = "memory";
 		/* We expect the bootloader to fill in the reg */
-		reg = <0 0 0 0>;
+		reg = <0 0x80000000 0 0>;
 	};
 
 	reserved-memory {
@@ -37,9 +37,13 @@
 			no-map;
 		};
 
-		smem_mem: smem_region@86300000 {
+		smem@86300000 {
+			compatible = "qcom,smem";
 			reg = <0x0 0x86300000 0x0 0x100000>;
 			no-map;
+
+			hwlocks = <&tcsr_mutex 3>;
+			qcom,rpm-msg-ram = <&rpm_msg_ram>;
 		};
 
 		other_ext_region@86400000 {
@@ -568,51 +572,44 @@
 						compatible = "operating-points-v2";
 
 						rpmpd_opp_ret: opp1 {
-							opp-level = <16>;
+							opp-level = <RPM_SMD_LEVEL_RETENTION>;
 						};
 
 						rpmpd_opp_ret_plus: opp2 {
-							opp-level = <32>;
+							opp-level = <RPM_SMD_LEVEL_RETENTION_PLUS>;
 						};
 
 						rpmpd_opp_min_svs: opp3 {
-							opp-level = <48>;
+							opp-level = <RPM_SMD_LEVEL_MIN_SVS>;
 						};
 
 						rpmpd_opp_low_svs: opp4 {
-							opp-level = <64>;
+							opp-level = <RPM_SMD_LEVEL_LOW_SVS>;
 						};
 
 						rpmpd_opp_svs: opp5 {
-							opp-level = <128>;
+							opp-level = <RPM_SMD_LEVEL_SVS>;
 						};
 
 						rpmpd_opp_svs_plus: opp6 {
-							opp-level = <192>;
+							opp-level = <RPM_SMD_LEVEL_SVS_PLUS>;
 						};
 
 						rpmpd_opp_nom: opp7 {
-							opp-level = <256>;
+							opp-level = <RPM_SMD_LEVEL_NOM>;
 						};
 
 						rpmpd_opp_nom_plus: opp8 {
-							opp-level = <320>;
+							opp-level = <RPM_SMD_LEVEL_NOM_PLUS>;
 						};
 
 						rpmpd_opp_turbo: opp9 {
-							opp-level = <384>;
+							opp-level = <RPM_SMD_LEVEL_TURBO>;
 						};
 					};	
 				};
 			};
 		};
-	};
-
-	smem {
-		compatible = "qcom,smem";
-		memory-region = <&smem_mem>;
-		qcom,rpm-msg-ram = <&rpm_msg_ram>;
-		hwlocks = <&tcsr_mutex 3>;
 	};
 
 	soc: soc {
@@ -806,20 +803,15 @@
 			status = "disabled";
 		};
 
+		tcsr_mutex: hwlock@1905000 {
+			compatible = "qcom,tcsr-mutex";
+			reg = <0x1905000 0x20000>;
+			#hwlock-cells = <1>;
+		};
+
 		tcsr: syscon@1937000 {
 			compatible = "qcom,tcsr-msm8937", "syscon";
 			reg = <0x01937000 0x30000>;
-		};
-
-		tcsr_mutex_regs: syscon@1905000 {
-			compatible = "syscon";
-			reg = <0x01905000 0x20000>;
-		};
-
-		tcsr_mutex: hwlock {
-			compatible = "qcom,tcsr-mutex";
-			syscon = <&tcsr_mutex_regs 0 0x1000>;
-			#hwlock-cells = <1>;
 		};
 
 		apps_smmu: iommu@1e00000 {
