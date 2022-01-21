@@ -184,6 +184,9 @@
 #define GCC_GTCU_AHB_CLK					180
 #define GCC_OXILI_GMEM_CLK					181
 #define GCC_IPA_TBU_CLK						182
+#define GPLL0       			            183
+#define GPLL4       			            184
+#define GPLL3       			            185
 
 /* GCC resets */
 #define GCC_CAMSS_MICRO_BCR			        0
