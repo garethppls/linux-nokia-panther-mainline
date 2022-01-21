@@ -199,18 +199,11 @@
 	panel: panel@0 {
 		compatible = "mdss,ili9881c-ebbgdjn";
 		reg = <0>;
-
-		backlight = <&pmi8950_wled>;
-		
-		supply-names = "vsp", "vsn";
-		vsp-supply = <&lab_vreg>;
-		vsn-supply = <&ibb_vreg>;
 		
 		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_LOW>;
 		
-		pinctrl-names = "default", "sleep";
-		pinctrl-0 = <&mdss_dsi_active &mdss_te_active>;
-		pinctrl-1 = <&mdss_dsi_suspend &mdss_te_suspend>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&mdss_dsi_active>;
 
 		port {
 			panel_in: endpoint {
@@ -223,6 +216,10 @@
 &dsi0_out {
 	data-lanes = <0 1 2 3>;
 	remote-endpoint = <&panel_in>;
+};
+
+&dsi_phy0 {
+	qcom,dsi-phy-regulator-ldo-mode;
 };
 
 &sdhc_1 {
@@ -257,6 +254,7 @@
 		drive-strength = <2>;
 		bias-pull-up;
 	};
+
 	ts_int_active: ts-int-active-pins {
 		pins = "gpio65";
 		function = "gpio";
@@ -269,36 +267,6 @@
 		function = "gpio";
 		drive-strength = <2>;
 		bias-pull-down;
-	};
-	
-	mdss_dsi_active: mdss_dsi_active {
-		pins = "gpio60", "gpio98", "gpio99";
-		function = "gpio";
-		drive-strength = <8>; /* 8 mA */
-		bias-disable = <0>; /* no pull */
-		output-high;
-	};
-
-	mdss_dsi_suspend: mdss_dsi_suspend {
-		pins = "gpio60", "gpio98", "gpio99";
-		function = "gpio";
-		drive-strength = <2>; /* 2 mA */
-		bias-pull-down; /* pull down */
-		input-enable;
-	};
-	
-	mdss_te_active: mdss_te_active {
-		pins = "gpio24";
-		function = "mdp_vsync";
-		drive-strength = <2>; /* 8 mA */
-		bias-pull-down; /* pull down*/
-	};
-
-	mdss_te_suspend: mdss_te_suspend {
-		pins = "gpio24";
-		function = "mdp_vsync";
-		drive-strength = <2>; /* 2 mA */
-		bias-pull-down; /* pull down */
 	};
 };
 
@@ -330,6 +298,7 @@
 	l5 {
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
 	};
 	l6 {
 		regulator-min-microvolt = <1800000>;
@@ -383,6 +352,18 @@
 	l19 {
 		regulator-min-microvolt = <1225000>;
 		regulator-max-microvolt = <1350000>;
+	};
+	l20 {
+		regulator-min-microvolt = <1740000>;
+		regulator-max-microvolt = <1740000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+	l21 {
+		regulator-min-microvolt = <1740000>;
+		regulator-max-microvolt = <1740000>;
+		regulator-boot-on;
+		regulator-always-on;
 	};
 	l22 {
 		regulator-min-microvolt = <2800000>;

@@ -844,8 +844,7 @@ static const struct mdp5_cfg_hw msm8937_config = {
 	.name = "msm8937",
 	.mdp = {
 		.count = 1,
-		.caps = MDP_CAP_CDM |
-			MDP_CAP_SRC_SPLIT,
+		.caps = MDP_CAP_CDM,
 	},
 	.ctl = {
 		.count = 3,
@@ -891,16 +890,16 @@ static const struct mdp5_cfg_hw msm8937_config = {
 	},
 
 	.lm = {
-		.count = 2,
+		.count = 3,
 		.base = { 0x44000, 0x45000 },
 		.instances = {
 				{ .id = 0, .pp = 0, .dspp = 0,
 				  .caps = MDP_LM_CAP_DISPLAY |
 					  MDP_LM_CAP_PAIR },
-				{ .id = 1, .pp = -1, .dspp = -1,
-				  .caps = MDP_LM_CAP_WB },
+				{ .id = 1, .pp = 1, .dspp = -1,
+				  .caps = MDP_LM_CAP_DISPLAY },
 			     },
-		.nb_stages = 8,
+		.nb_stages = 5,
 		.max_width = 2048,
 		.max_height = 0xFFFF,
 	},
@@ -911,7 +910,7 @@ static const struct mdp5_cfg_hw msm8937_config = {
 	},
 	.pp = {
 		.count = 2,
-		.base = { 0x70000 , 0x70800 },
+		.base = { 0x70000, 0x70800 },
 	},
 	.cdm = {
 		.count = 1,

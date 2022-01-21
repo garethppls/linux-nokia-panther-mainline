@@ -1322,6 +1322,7 @@ static struct clk_rcg2 esc0_clk_src = {
 		.parent_names = gcc_parent_names_11,
 		.num_parents = ARRAY_SIZE(gcc_parent_names_11),
 		.ops = &clk_rcg2_ops,
+		.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE,
 	},
 };
 
@@ -3151,7 +3152,7 @@ static struct clk_branch gcc_mdss_esc0_clk = {
 				"esc0_clk_src",
 			},
 			.num_parents = 1,
-			.flags = CLK_SET_RATE_PARENT,
+			.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE,
 			.ops = &clk_branch2_ops,
 		},
 	},
@@ -3585,6 +3586,7 @@ static struct gdsc oxili_cx_gdsc = {
 	.pd = {
 		.name = "oxili_cx",
 	},
+	.parent = &oxili_gx_gdsc.pd,
 	.pwrsts = PWRSTS_OFF_ON,
 };
 
@@ -3917,6 +3919,10 @@ static int gcc_msm8937_probe(struct platform_device *pdev)
 	}	
 
 	clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_config);
+
+	/* Make MDSS happy at boot */
+	clk_set_rate(esc0_clk_src.clkr.hw.clk, 19200000);
+	clk_set_rate(gcc_mdss_esc0_clk.clkr.hw.clk, 19200000);
 
 	return qcom_cc_really_probe(pdev, &gcc_msm8937_desc, regmap);
 }

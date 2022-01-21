@@ -106,8 +106,8 @@
 		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_LOW>;
 		
 		pinctrl-names = "default", "sleep";
-		pinctrl-0 = <&mdss_dsi_active &mdss_te_active>;
-		pinctrl-1 = <&mdss_dsi_suspend &mdss_te_suspend>;
+		pinctrl-0 = <&mdss_dsi_active>;
+		pinctrl-1 = <&mdss_dsi_suspend>;
 
 		port {
 			panel_in: endpoint {
@@ -158,6 +158,7 @@
 		drive-strength = <2>;
 		bias-pull-up;
 	};
+	
 	ts_int_active: ts-int-active-pins {
 		pins = "gpio65";
 		function = "gpio";
