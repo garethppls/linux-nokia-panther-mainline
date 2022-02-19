@@ -923,6 +923,12 @@ clk_trion_pll_recalc_rate(struct clk_hw *hw, unsigned long parent_rate)
 	return alpha_pll_calc_rate(parent_rate, l, frac, alpha_width);
 }
 
+const struct clk_ops clk_alpha_pll_sleep_vote_ops = {
+	.enable = clk_enable_regmap,
+	.disable = clk_disable_regmap,
+};
+EXPORT_SYMBOL_GPL(clk_alpha_pll_sleep_vote_ops);
+
 const struct clk_ops clk_alpha_pll_fixed_ops = {
 	.enable = clk_alpha_pll_enable,
 	.disable = clk_alpha_pll_disable,
