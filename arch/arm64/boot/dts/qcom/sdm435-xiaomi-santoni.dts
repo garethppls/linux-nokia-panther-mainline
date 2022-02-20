@@ -225,6 +225,10 @@
 	remote-endpoint = <&panel_in>;
 };
 
+&dsi_phy0 {
+	qcom,dsi-phy-regulator-ldo-mode;
+};
+
 &sdhc_1 {
 	status = "okay";
 
