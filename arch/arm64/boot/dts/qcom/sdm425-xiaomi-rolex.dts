@@ -34,6 +34,15 @@
 		};
 	};
 
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pm8937_pwm 0 100000>;
+
+		brightness-levels = <0 255>;
+		num-interpolated-steps = <255>;
+		default-brightness-level = <255>;
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 
@@ -107,6 +116,7 @@
 		
 		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_LOW>;
 		
+		backlight = <&backlight>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&mdss_dsi_active>;
 		pinctrl-1 = <&mdss_dsi_suspend>;
@@ -146,6 +156,32 @@
 	cd-gpios = <&msmgpio 67 GPIO_ACTIVE_LOW>;
 };
 
+&pm8937_resin {
+	status = "okay";
+	linux,code = <KEY_VOLUMEDOWN>;
+};
+
+&pm8937_vib {
+	status = "okay";
+};
+
+&pm8937_pwm {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_out>;
+};
+
+&pm8937_gpios {
+	pwm_out: gpio8 {
+		pins = "gpio8";
+		function = "dtest2";
+		output-low;
+		bias-disable;
+		qcom,drive-strength = <2>;
+		status = "okay";
+	};
+};
+
 &msmgpio {
 	ts_reset_active: ts-reset-active-pins {
 		pins = "gpio64";
@@ -181,10 +217,6 @@
 		drive-strength = <2>;
 		bias-pull-down;
 	};*/
-};
-
-&pm8937_vib {
-	status = "okay";
 };
 
 &smd_rpm_regulators {
