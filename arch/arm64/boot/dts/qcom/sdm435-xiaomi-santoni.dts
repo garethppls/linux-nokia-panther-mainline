@@ -245,6 +245,11 @@
 	cd-gpios = <&msmgpio 67 GPIO_ACTIVE_LOW>;
 };
 
+&pm8937_resin {
+	status = "okay";
+	linux,code = <KEY_VOLUMEDOWN>;
+};
+
 &msmgpio {
 	ts_reset_active: ts-reset-active-pins {
 		pins = "gpio64";
