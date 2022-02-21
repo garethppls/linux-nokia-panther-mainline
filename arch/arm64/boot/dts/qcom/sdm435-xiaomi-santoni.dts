@@ -16,9 +16,7 @@
 	aliases {
 		panel = &panel;
 	};
-
-	chosen {};
-
+	
 	reserved-memory {
 		/delete-node/other_ext_region@85b00000;
 
