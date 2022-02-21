@@ -114,7 +114,7 @@
 		
 		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_LOW>;
 		
-		backlight = <&backlight>;
+		//backlight = <&backlight>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&mdss_dsi_active>;
 		pinctrl-1 = <&mdss_dsi_suspend>;
