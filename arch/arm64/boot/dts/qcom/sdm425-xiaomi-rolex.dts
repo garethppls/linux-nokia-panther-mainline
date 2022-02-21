@@ -88,6 +88,30 @@
 			color = <LED_COLOR_ID_BLUE>;
 		};
 	};
+
+	regulator@3e {
+		compatible = "ti,tps65132";
+		reg = <0x3e>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&reg_lcd_en_default>;
+
+		reg_lcd_pos: outp {
+			regulator-name = "outp";
+			regulator-min-microvolt = <5400000>;
+			regulator-max-microvolt = <5400000>;
+			enable-gpios = <&msmgpio 126 GPIO_ACTIVE_HIGH>;
+			regulator-active-discharge = <1>;
+		};
+
+		reg_lcd_neg: outn {
+			regulator-name = "outn";
+			regulator-min-microvolt = <5400000>;
+			regulator-max-microvolt = <5400000>;
+			enable-gpios = <&msmgpio 127 GPIO_ACTIVE_HIGH>;
+			regulator-active-discharge = <1>;
+		};
+	};
 };
 
 &blsp_i2c3 {
@@ -112,6 +136,10 @@
 		compatible = "mdss,nt35521s-ebbg";
 		reg = <0>;
 		
+		supply-names = "vsp", "vsn";
+		vsp-supply = <&reg_lcd_pos>;
+		vsn-supply = <&reg_lcd_neg>;
+
 		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_LOW>;
 		
 		//backlight = <&backlight>;
@@ -208,13 +236,13 @@
 		drive-strength = <2>;
 		bias-pull-down;
 	};
-	/*
+
 	reg_lcd_en_default: reg_lcd_en_default {
 		pins = "gpio126", "gpio127";
 		function = "gpio";
 		drive-strength = <2>;
 		bias-pull-down;
-	};*/
+	};
 };
 
 &smd_rpm_regulators {

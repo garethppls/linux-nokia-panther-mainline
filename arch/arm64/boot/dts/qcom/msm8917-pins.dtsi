@@ -374,7 +374,7 @@
 
 	/* MISC PINs */
 	gpio_key_default: gpio-key-default-pins {
-		pins = "gpio91", "gpio127", "gpio128";
+		pins = "gpio91";
 		function = "gpio";
 		drive-strength = <2>;
 		bias-pull-up;
