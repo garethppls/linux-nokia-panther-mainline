@@ -55,6 +55,11 @@
 			linux,code = <KEY_VOLUMEUP>;
 		};
 	};
+
+	vibrator {
+		compatible = "gpio-vibrator";
+		enable-gpios = <&msmgpio 97 GPIO_ACTIVE_HIGH>;
+	};
 };
 
 &blsp_i2c2 {
@@ -185,10 +190,6 @@
 &pm8937_resin {
 	status = "okay";
 	linux,code = <KEY_VOLUMEDOWN>;
-};
-
-&pm8937_vib {
-	status = "okay";
 };
 
 &pm8937_pwm {
