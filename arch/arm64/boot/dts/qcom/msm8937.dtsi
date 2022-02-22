@@ -387,11 +387,10 @@
 		};
 		opp-998400000 {
 			opp-hz = /bits/ 64 <998400000>;
-			required-opps = <&cpr_opp3>;
+			required-opps = <&cpr_opp2>;
 		};
 		opp-1094400000 {
 			opp-hz = /bits/ 64 <1094400000>;
-			required-opps = <&cpr_opp3>;
 		};
 	};
 
@@ -400,10 +399,14 @@
 			     	 "operating-points-v2-kryo-cpu";
 		nvmem-cells = <&cpr_efuse_speedbin>;
 		opp-shared;
+		opp-729600000 {
+			opp-hz = /bits/ 64 <729600000>;
+			required-opps = <&cpr_opp1>;
+			opp-suspend;
+		};
 		opp-960000000 {
 			opp-hz = /bits/ 64 <960000000>;
 			required-opps = <&cpr_opp1>;
-			opp-suspend;
 		};
 		opp-1094400000 {
 			opp-hz = /bits/ 64 <1094400000>;
