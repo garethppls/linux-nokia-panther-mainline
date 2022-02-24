@@ -1251,6 +1251,26 @@ static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8937[] = {
 	{ }
 };
 
+static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8940[] = {
+	F(19200000, P_XO, 1, 0, 0),
+	F(50000000, P_GPLL0, 16, 0, 0),
+	F(80000000, P_GPLL0, 10, 0, 0),
+	F(100000000, P_GPLL0, 8, 0, 0),
+	F(160000000, P_GPLL0, 5, 0, 0),
+	F(200000000, P_GPLL0, 4, 0, 0),
+	F(216000000, P_GPLL6, 5, 0, 0),
+	F(228570000, P_GPLL0, 3.5, 0, 0),
+	F(240000000, P_GPLL6, 4.5, 0, 0),
+	F(266670000, P_GPLL0, 3, 0, 0),
+	F(300000000, P_GPLL3, 1, 0, 0),
+	F(320000000, P_GPLL0, 2.5, 0, 0),
+	F(375000000, P_GPLL3, 1, 0, 0),
+	F(400000000, P_GPLL0, 2, 0, 0),
+	F(450000000, P_GPLL3, 1, 0, 0),
+	F(475000000, P_GPLL3, 1, 0, 0),
+	{ }
+};
+
 static struct clk_rcg2 gfx3d_clk_src = {
 	.cmd_rcgr = 0x59000,
 	.mnd_width = 0,
@@ -3730,8 +3750,9 @@ static int gcc_msm8937_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	/* Registr specific clock for msm8940 */
+	/* Registr specific freq and clock for msm8940 */
 	if (of_device_is_compatible(pdev->dev.of_node, "qcom,gcc-msm8940")) {
+		gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_msm8940;
 		gcc_msm8937_desc.clks[GCC_IPA_TBU_CLK] = &gcc_ipa_tbu_clk.clkr;
 	}
 	
