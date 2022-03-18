@@ -70,6 +70,11 @@
 		compatible = "gpio-vibrator";
 		enable-gpios = <&msmgpio 97 GPIO_ACTIVE_HIGH>;
 	};
+
+	usb_id: usb-id {
+		compatible = "linux,extcon-usb-gpio";
+		id-gpio = <&msmgpio 134 GPIO_ACTIVE_HIGH>;
+	};
 };
 
 &blsp_i2c2 {
@@ -163,9 +168,9 @@
 
 		usb_vbus: usb-vbus {
 			regulator-name = "usb_vbus";
-			regulator-min-microvolt = <400000>;
-			regulator-max-microvolt = <500000>;
-			regulator-min-microamp = <500000>;
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			regulator-min-microamp = <750000>;
 			regulator-max-microamp = <750000>;
 			summit,needs-inok-toggle;
 		};
@@ -261,6 +266,17 @@
 		qcom,drive-strength = <2>;
 		status = "okay";
 	};
+};
+
+&usb {
+	status = "okay";
+	qcom,init-seq = /bits/ 8 <0x39 0x81 0x37 0x82>;
+	vbus-supply = <&usb_vbus>;
+	extcon = <&power_supply>, <&power_supply>;
+};
+
+&usb_hs_phy {
+	extcon = <&power_supply>;
 };
 
 &msmgpio {

@@ -27,6 +27,12 @@
 	vdd-apc-step-uv = <5000>;
 };
 
+&usb_hs_phy {
+	v1p8-supply = <&pm8937_l7>;
+	v3p3-supply = <&pm8937_l13>;
+};
+
+
 &rpm_requests {
 	smd_rpm_regulators: pm8937-regulators {
 		compatible = "qcom,rpm-pm8937-regulators";
