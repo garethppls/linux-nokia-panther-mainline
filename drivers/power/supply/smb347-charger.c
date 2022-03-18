@@ -19,6 +19,7 @@
 #include <linux/property.h>
 #include <linux/regmap.h>
 #include <linux/regulator/driver.h>
+#include <linux/extcon-provider.h>
 
 #include <dt-bindings/power/summit,smb347-charger.h>
 
@@ -195,6 +196,7 @@
  */
 struct smb347_charger {
 	struct device		*dev;
+	struct extcon_dev 	*edev;
 	struct regmap		*regmap;
 	struct power_supply	*mains;
 	struct power_supply	*usb;
@@ -225,6 +227,11 @@ struct smb347_charger {
 	bool			use_usb_otg;
 	unsigned int		enable_control;
 	unsigned int		inok_polarity;
+};
+
+static const unsigned int usb_extcon_cable[] = {
+	EXTCON_USB,
+	EXTCON_NONE,
 };
 
 enum smb_charger_chipid {
@@ -327,6 +334,7 @@ static int smb347_update_ps_status(struct smb347_charger *smb)
 	ret = smb->mains_online != dc || smb->usb_online != usb;
 	smb->mains_online = dc;
 	smb->usb_online = usb;
+	extcon_set_state_sync(smb->edev, EXTCON_USB, smb->usb_online);
 
 	return ret;
 }
@@ -1461,6 +1469,8 @@ static int smb347_usb_vbus_regulator_disable(struct regulator_dev *rdev)
 
 	smb->usb_vbus_enabled = false;
 
+	
+
 	if (device_property_read_bool(&rdev->dev, "summit,needs-inok-toggle")) {
 		unsigned int sysok = 0;
 
@@ -1568,6 +1578,14 @@ static int smb347_probe(struct i2c_client *client,
 		if (IS_ERR(smb->usb))
 			return PTR_ERR(smb->usb);
 	}
+
+	smb->edev = devm_extcon_dev_allocate(dev, usb_extcon_cable);
+	if (IS_ERR(smb->edev))
+		return -ENOMEM;
+
+	ret = devm_extcon_dev_register(dev, smb->edev);
+	if (ret < 0)
+		return ret;
 
 	ret = smb347_get_battery_info(smb);
 	if (ret)
