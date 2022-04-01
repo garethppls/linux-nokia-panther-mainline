@@ -138,33 +138,34 @@ static struct clk_alpha_pll gpll4 = {
 	},
 };
 
-static struct clk_alpha_pll gpll6_early = {
-	.offset = 0x37000,
-	.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
-	.clkr = {
-		.enable_reg = 0x45000,
-		.enable_mask = BIT(7),
-		.hw.init = &(struct clk_init_data){
-			.name = "gpll6_early",
-			.parent_data = &(const struct clk_parent_data) {
+static struct clk_pll gpll6_early = {
+	.l_reg = 0x37004,
+	.m_reg = 0x37008,
+	.n_reg = 0x3700C,
+	.config_reg = 0x37014,
+	.mode_reg = 0x37000,
+	.status_reg = 0x3701C,
+	.status_bit = 17,
+	.clkr.hw.init = &(struct clk_init_data){
+		.name = "gpll6",
+		.parent_data = &(const struct clk_parent_data) {
 				.fw_name = "xo",
-			},
-			.num_parents = 1,
-			.ops = &clk_alpha_pll_fixed_ops,
 		},
+		.num_parents = 1,
+		.ops = &clk_pll_ops,
 	},
 };
 
-static struct clk_alpha_pll_postdiv gpll6 = {
-	.offset = 0x37000,
-	.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
-	.clkr.hw.init = &(struct clk_init_data){
-		.name = "gpll6",
-		.parent_hws = (const struct clk_hw*[]){
-			&gpll6_early.clkr.hw,
+static struct clk_regmap gpll6 = {
+	.enable_reg = 0x45000,
+	.enable_mask = BIT(7),
+	.hw.init = &(struct clk_init_data){
+		.name = "gpll6_vote",
+		.parent_data = &(const struct clk_parent_data) {
+			.hw = &gpll6_early.clkr.hw,
 		},
 		.num_parents = 1,
-		.ops = &clk_alpha_pll_postdiv_ro_ops,
+		.ops = &clk_pll_vote_ops,
 	},
 };
 
@@ -706,7 +707,7 @@ static const struct parent_map gcc_xo_gpll0_gpll6_map[] = {
 static const struct clk_parent_data gcc_xo_gpll0_gpll6_data[] = {
 	{ .fw_name = "xo" },
 	{ .hw = &gpll0.clkr.hw },
-	{ .hw = &gpll6.clkr.hw },
+	{ .hw = &gpll6.hw },
 };
 
 static const struct freq_tbl ftbl_jpeg0_clk_src[] = {
@@ -860,7 +861,7 @@ static const struct parent_map gcc_xo_gpll0_gpll6_sleep_map[] = {
 static const struct clk_parent_data gcc_xo_gpll0_gpll6_sleep_data[] = {
 	{ .fw_name = "xo" },
 	{ .hw = &gpll0.clkr.hw },
-	{ .hw = &gpll6.clkr.hw },
+	{ .hw = &gpll6.hw },
 	{ .fw_name = "sleep_clk", .name = "sleep_clk" },
 };
 
@@ -1077,7 +1078,7 @@ static const struct parent_map gcc_vfe_map[] = {
 static const struct clk_parent_data gcc_vfe_data[] = {
 	{ .fw_name = "xo" },
 	{ .hw = &gpll0.clkr.hw },
-	{ .hw = &gpll6.clkr.hw },
+	{ .hw = &gpll6.hw },
 	{ .hw = &gpll4.clkr.hw },
 };
 
@@ -1207,7 +1208,7 @@ static const struct clk_parent_data gcc_gfx3d_data[] = {
 	{ .fw_name = "xo" },
 	{ .hw = &gpll0.clkr.hw },
 	{ .hw = &gpll3.clkr.hw },
-	{ .hw = &gpll6.clkr.hw },
+	{ .hw = &gpll6.hw },
 };
 
 static struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8917[] = {
@@ -1295,7 +1296,7 @@ static const struct parent_map gcc_mdp_map[] = {
 static const struct clk_parent_data gcc_mdp_data[] = {
 	{ .fw_name = "xo" },
 	{ .hw = &gpll0.clkr.hw },
-	{ .hw = &gpll6.clkr.hw },
+	{ .hw = &gpll6.hw },
 };
 
 static const struct freq_tbl ftbl_mdp_clk_src[] = {
@@ -1382,7 +1383,7 @@ static const struct clk_parent_data gcc_sdcc1_data[] = {
 	{ .fw_name = "xo" },
 	{ .hw = &gpll0.clkr.hw },
 	{ .hw = &gpll4.clkr.hw },
-	{ .hw = &gpll6.clkr.hw },
+	{ .hw = &gpll6.hw },
 };
 
 static const struct freq_tbl ftbl_sdcc1_apps_clk_src[] = {
@@ -3460,7 +3461,7 @@ static struct clk_regmap *gcc_msm8937_clocks[] = {
 	[GPLL3] = &gpll3.clkr,
 	[GPLL4] = &gpll4.clkr,
 	[GPLL6_EARLY] = &gpll6_early.clkr,
-	[GPLL6] = &gpll6.clkr,
+	[GPLL6] = &gpll6,
 	[APSS_AHB_CLK_SRC] = &apss_ahb_clk_src.clkr,
 	[BLSP1_QUP1_I2C_APPS_CLK_SRC] = &blsp1_qup1_i2c_apps_clk_src.clkr,
 	[BLSP1_QUP1_SPI_APPS_CLK_SRC] = &blsp1_qup1_spi_apps_clk_src.clkr,
