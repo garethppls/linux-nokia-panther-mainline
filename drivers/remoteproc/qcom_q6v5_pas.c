@@ -827,6 +827,7 @@ static const struct of_device_id adsp_of_match[] = {
 	{ .compatible = "qcom,msm8996-slpi-pil", .data = &slpi_resource_init},
 	{ .compatible = "qcom,msm8998-adsp-pas", .data = &msm8996_adsp_resource},
 	{ .compatible = "qcom,msm8998-slpi-pas", .data = &slpi_resource_init},
+	{ .compatible = "qcom,msm8937-adsp-pil", .data = &msm8996_adsp_resource},
 	{ .compatible = "qcom,qcs404-adsp-pas", .data = &adsp_resource_init },
 	{ .compatible = "qcom,qcs404-cdsp-pas", .data = &cdsp_resource_init },
 	{ .compatible = "qcom,qcs404-wcss-pas", .data = &wcss_resource_init },
