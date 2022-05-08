@@ -117,6 +117,7 @@
 #define QDSP6v56_CLAMP_QMC_MEM		BIT(22)
 #define QDSP6SS_XO_CBCR		0x0038
 #define QDSP6SS_ACC_OVERRIDE_VAL		0x20
+#define QDSP6SS_ACC_OVERRIDE_VAL_MSM8937	0x80800000
 
 /* QDSP6v65 parameters */
 #define QDSP6SS_CORE_CBCR		0x20
@@ -233,6 +234,8 @@ struct q6v5 {
 
 enum {
 	MSS_MSM8916,
+	MSS_MSM8937,
+	MSS_MSM8940,
 	MSS_MSM8974,
 	MSS_MSM8996,
 	MSS_MSM8998,
@@ -686,12 +689,21 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 		}
 		goto pbl_wait;
 	} else if (qproc->version == MSS_MSM8996 ||
-		   qproc->version == MSS_MSM8998) {
+		   qproc->version == MSS_MSM8998 ||
+		   qproc->version == MSS_MSM8937 ||
+		   qproc->version == MSS_MSM8940) {
 		int mem_pwr_ctl;
 
 		/* Override the ACC value if required */
-		writel(QDSP6SS_ACC_OVERRIDE_VAL,
+		if(qproc->version == MSS_MSM8937 ||
+		   qproc->version == MSS_MSM8940) {
+			writel(QDSP6SS_ACC_OVERRIDE_VAL_MSM8937,
 		       qproc->reg_base + QDSP6SS_STRAP_ACC);
+		} else {
+			writel(QDSP6SS_ACC_OVERRIDE_VAL,
+		       qproc->reg_base + QDSP6SS_STRAP_ACC);
+		}
+		
 
 		/* Assert resets, stop core */
 		val = readl(qproc->reg_base + QDSP6SS_RESET_REG);
@@ -733,7 +745,9 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 		writel(val, qproc->reg_base + QDSP6SS_PWR_CTL_REG);
 
 		/* Turn on L1, L2, ETB and JU memories 1 at a time */
-		if (qproc->version == MSS_MSM8996) {
+		if (qproc->version == MSS_MSM8996 ||
+		    qproc->version == MSS_MSM8937 ||
+			qproc->version == MSS_MSM8940) {
 			mem_pwr_ctl = QDSP6SS_MEM_PWR_CTL;
 			i = 19;
 		} else {
@@ -742,17 +756,42 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 			i = 28;
 		}
 		val = readl(qproc->reg_base + mem_pwr_ctl);
-		for (; i >= 0; i--) {
-			val |= BIT(i);
-			writel(val, qproc->reg_base + mem_pwr_ctl);
-			/*
-			 * Read back value to ensure the write is done then
-			 * wait for 1us for both memory peripheral and data
-			 * array to turn on.
-			 */
-			val |= readl(qproc->reg_base + mem_pwr_ctl);
-			udelay(1);
+		if(qproc->version != MSS_MSM8937) {
+			for (; i >= 0; i--) {
+				val |= BIT(i);
+				writel(val, qproc->reg_base + mem_pwr_ctl);
+				/*
+				 * Read back value to ensure the write is done then
+				 * wait for 1us for both memory peripheral and data
+				 * array to turn on.
+				 */
+				val |= readl(qproc->reg_base + mem_pwr_ctl);
+				udelay(1);
+			}
+		} else {
+			for (; i >= 6; i--) {
+				val |= BIT(i);
+				writel(val, qproc->reg_base +
+							QDSP6SS_MEM_PWR_CTL);
+				/*
+				 * Wait for 1us for both memory peripheral and
+				 * data array to turn on.
+				 */
+				udelay(1);
+			}
+
+			for (i = 0 ; i <= 5 ; i++) {
+				val |= BIT(i);
+				writel(val, qproc->reg_base +
+							QDSP6SS_MEM_PWR_CTL);
+				/*
+				 * Wait for 1us for both memory peripheral and
+				 * data array to turn on.
+				 */
+				udelay(1);
+			}
 		}
+		
 		/* Remove word line clamp */
 		val = readl(qproc->reg_base + QDSP6SS_PWR_CTL_REG);
 		val &= ~QDSP6v56_CLAMP_WL;
@@ -2231,6 +2270,80 @@ static const struct rproc_hexagon_res msm8916_mss = {
 	.version = MSS_MSM8916,
 };
 
+static const struct rproc_hexagon_res msm8937_mss = {
+	.hexagon_mba_image = "mba.mbn",
+	.proxy_supply = (struct qcom_mss_reg_res[]) {
+		{
+			.supply = "pll",
+			.uA = 100000,
+		},
+		{}
+	},
+	.proxy_pd_names = (char*[]) {
+			"cx",
+			"mx",
+			NULL
+	},
+	.active_supply = (struct qcom_mss_reg_res[]) {
+		{
+			.supply = "mss",
+			.uV = 1050000,
+			.uA = 100000,
+		},
+		{}
+	},
+	.proxy_clk_names = (char*[]){
+		"xo",
+		NULL
+	},
+	.active_clk_names = (char*[]){
+		"iface",
+		"bus",
+		"mem",
+		NULL
+	},
+	.need_mem_protection = false,
+	.has_alt_reset = false,
+	.version = MSS_MSM8937,
+};
+
+static const struct rproc_hexagon_res msm8940_mss = {
+	.hexagon_mba_image = "mba.mbn",
+	.proxy_supply = (struct qcom_mss_reg_res[]) {
+		{
+			.supply = "pll",
+			.uA = 100000,
+		},
+		{}
+	},
+	.proxy_pd_names = (char*[]) {
+			"cx",
+			"mx",
+			NULL
+	},
+	.active_supply = (struct qcom_mss_reg_res[]) {
+		{
+			.supply = "mss",
+			.uV = 1050000,
+			.uA = 100000,
+		},
+		{}
+	},
+	.proxy_clk_names = (char*[]){
+		"xo",
+		NULL
+	},
+	.active_clk_names = (char*[]){
+		"iface",
+		"bus",
+		"mem",
+		NULL
+	},
+	.need_mem_protection = false,
+	.has_alt_reset = false,
+	.version = MSS_MSM8940,
+};
+
 static const struct rproc_hexagon_res msm8974_mss = {
 	.hexagon_mba_image = "mba.b00",
 	.proxy_supply = (struct qcom_mss_reg_res[]) {
@@ -2287,6 +2400,8 @@ static const struct rproc_hexagon_res msm8974_mss = {
 static const struct of_device_id q6v5_of_match[] = {
 	{ .compatible = "qcom,q6v5-pil", .data = &msm8916_mss},
 	{ .compatible = "qcom,msm8916-mss-pil", .data = &msm8916_mss},
+	{ .compatible = "qcom,msm8937-mss-pil", .data = &msm8937_mss},
+	{ .compatible = "qcom,msm8940-mss-pil", .data = &msm8940_mss},
 	{ .compatible = "qcom,msm8974-mss-pil", .data = &msm8974_mss},
 	{ .compatible = "qcom,msm8996-mss-pil", .data = &msm8996_mss},
 	{ .compatible = "qcom,msm8998-mss-pil", .data = &msm8998_mss},
