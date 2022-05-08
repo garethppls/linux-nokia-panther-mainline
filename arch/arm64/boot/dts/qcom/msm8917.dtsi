@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <dt-bindings/clock/qcom,gcc-msm8937.h>
+#include <dt-bindings/interconnect/qcom,msm8937.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/power/qcom-rpmpd.h>
@@ -97,6 +98,7 @@
 			operating-points-v2 = <&cluster0_opp_table>;
 			power-domains = <&cpr>, <&CPU_PD0>;
 			power-domain-names = "cpr", "psci";
+			interconnects = <&bimc MAS_APPS_PROC &bimc SLV_EBI>;
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 			L2_0: l2-cache {
@@ -117,6 +119,7 @@
 			operating-points-v2 = <&cluster0_opp_table>;
 			power-domains = <&cpr>, <&CPU_PD1>;
 			power-domain-names = "cpr", "psci";
+			interconnects = <&bimc MAS_APPS_PROC &bimc SLV_EBI>;
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 		};
@@ -133,6 +136,7 @@
 			operating-points-v2 = <&cluster0_opp_table>;
 			power-domains = <&cpr>, <&CPU_PD2>;
 			power-domain-names = "cpr", "psci";
+			interconnects = <&bimc MAS_APPS_PROC &bimc SLV_EBI>;
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 		};
@@ -149,6 +153,7 @@
 			operating-points-v2 = <&cluster0_opp_table>;
 			power-domains = <&cpr>, <&CPU_PD3>;
 			power-domain-names = "cpr", "psci";
+			interconnects = <&bimc MAS_APPS_PROC &bimc SLV_EBI>;
 			l1-icache { compatible = "cache"; };
 			l1-dcache { compatible = "cache"; };
 		};
@@ -541,23 +546,23 @@
 			#interconnect-cells = <1>;
 		};
 
-		snoc: interconnect-snoc@580000 {
+		snoc: interconnect@580000 {
 			compatible = "qcom,msm8937-snoc";
+			#interconnect-cells = <1>;
 			reg = <0x580000 0x16080>;
 			clock-names = "bus", "bus_a";
 			clocks = <&rpmcc RPM_SMD_SNOC_CLK>,
 				 <&rpmcc RPM_SMD_SNOC_A_CLK>;
-			#interconnect-cells = <1>;
+
+			sysmmnoc: interconnect-sysmmnoc {
+				compatible = "qcom,msm8937-sysmmnoc";
+				#interconnect-cells = <1>;
+				clock-names = "bus", "bus_a";
+				clocks = <&rpmcc RPM_SMD_SYSMMNOC_CLK>,
+					 <&rpmcc RPM_SMD_SYSMMNOC_A_CLK>;
+			};
 		};
 
-		sysmmnoc: interconnect-snoc-mm@580000 {
-			compatible = "qcom,msm8937-sysmmnoc";
-			reg = <0x580000 0x16080>;
-			clock-names = "bus", "bus_a";
-			clocks = <&rpmcc RPM_SMD_SYSMMNOC_CLK>,
-				 <&rpmcc RPM_SMD_SYSMMNOC_A_CLK>;
-			#interconnect-cells = <1>;
-		};
 
 		msmgpio: pinctrl@1000000 {
 			compatible = "qcom,msm8917-pinctrl";
@@ -758,6 +763,9 @@
 				phys = <&dsi_phy0>;
 				phy-names = "dsi-phy";
 
+				operating-points-v2 = <&dsi0_opp_table>;
+				power-domains = <&rpmpd MSM8937_VDDCX>;
+
 				#address-cells = <1>;
 				#size-cells = <0>;
 
@@ -778,6 +786,20 @@
 						};
 					};
 				};
+
+				dsi0_opp_table: dsi-opp-table {
+					compatible = "operating-points-v2";
+
+					opp-125000000 {
+						opp-hz = /bits/ 64 <125000000>;
+						required-opps = <&rpmpd_opp_svs>;
+					};
+
+					opp-187500000 {
+						opp-hz = /bits/ 64 <187500000>;
+						required-opps = <&rpmpd_opp_nom>;
+					};
+				};
 			};
 
 			mdp: mdp@1a01000 {
@@ -796,6 +818,10 @@
 					      "bus",
 					      "core",
 					      "vsync";
+
+				interconnects = <&sysmmnoc MAS_MDP &bimc SLV_EBI>,
+						<&bimc MAS_APPS_PROC &pcnoc SLV_DISP_SS_CFG>;
+				interconnect-names = "mdp0-mem", "cpu-cfg";
 
 				iommus = <&apps_smmu 0x2800 0>;
 
@@ -838,6 +864,8 @@
 			power-domains = <&gcc OXILI_GX_GDSC>;
 			operating-points-v2 = <&gpu_opp_table>;
 			#cooling-cells = <2>;
+			interconnects = <&bimc MAS_OXILI &bimc SLV_EBI>;
+			interconnect-names = "gfx-mem";
 			iommus = <&adreno_smmu 1 2>;
 
 			gpu_opp_table: opp-table {
@@ -907,12 +935,55 @@
 				 <&gcc GCC_SDCC1_AHB_CLK>,
 				 <&xo_board>;
 			clock-names = "core", "iface", "xo";
+			interconnects = <&pcnoc MAS_SDCC_1 &bimc SLV_EBI>,
+					<&bimc MAS_APPS_PROC &pcnoc SLV_SDCC_1>;
+			power-domains = <&rpmpd MSM8937_VDDCX>;
+			operating-points-v2 = <&sdhc1_opp_table>;
 			mmc-hs200-1_8v;
 			mmc-hs400-1_8v;
 			mmc-ddr-1_8v;
 			bus-width = <8>;
 			non-removable;
 			status = "disabled";
+
+			sdhc1_opp_table: opp-table-sdhc1 {
+				compatible = "operating-points-v2";
+
+				opp-25000000 {
+					opp-hz = /bits/ 64 <25000000>;
+					opp-peak-kBps = <200000>, <100000>;
+					opp-avg-kBps = <65360>, <32768>;
+					required-opps = <&rpmpd_opp_low_svs>;
+				};
+
+				opp-50000000 {
+					opp-hz = /bits/ 64 <50000000>;
+					opp-peak-kBps = <400000>, <200000>;
+					opp-avg-kBps = <130718>, <65360>;
+					required-opps = <&rpmpd_opp_svs>;
+				};
+
+				opp-100000000 {
+					opp-hz = /bits/ 64 <100000000>;
+					opp-peak-kBps = <400000>, <400000>;
+					opp-avg-kBps = <130718>, <65360>;
+					required-opps = <&rpmpd_opp_svs>;
+				};
+
+				opp-192000000 {
+					opp-hz = /bits/ 64 <192000000>;
+					opp-peak-kBps = <800000>, <600000>;
+					opp-avg-kBps = <261438>, <130718>;
+					required-opps = <&rpmpd_opp_nom>;
+				};
+
+				opp-384000000 {
+					opp-hz = /bits/ 64 <384000000>;
+					opp-peak-kBps = <800000>, <800000>;
+					opp-avg-kBps = <261438>, <300000>;
+					required-opps = <&rpmpd_opp_nom>;
+				};
+			};
 		};
 
 		sdhc_2: sdhci@7864900 {
@@ -927,8 +998,51 @@
 				 <&gcc GCC_SDCC2_AHB_CLK>,
 				 <&xo_board>;
 			clock-names = "core", "iface", "xo";
+			interconnects = <&pcnoc MAS_SDCC_2 &bimc SLV_EBI>,
+					<&bimc MAS_APPS_PROC &pcnoc SLV_SDCC_2>;
+			power-domains = <&rpmpd MSM8937_VDDCX>;
+			operating-points-v2 = <&sdhc2_opp_table>;
 			bus-width = <4>;
 			status = "disabled";
+
+			sdhc2_opp_table: opp-table-sdhc2 {
+				compatible = "operating-points-v2";
+
+				opp-25000000 {
+					opp-hz = /bits/ 64 <25000000>;
+					opp-peak-kBps = <200000>, <100000>;
+					opp-avg-kBps = <65360>, <32768>;
+					required-opps = <&rpmpd_opp_low_svs>;
+				};
+
+				opp-50000000 {
+					opp-hz = /bits/ 64 <50000000>;
+					opp-peak-kBps = <400000>, <400000>;
+					opp-avg-kBps = <130718>, <65360>;
+					required-opps = <&rpmpd_opp_svs>;
+				};
+
+				opp-100000000 {
+					opp-hz = /bits/ 64 <100000000>;
+					opp-peak-kBps = <800000>, <400000>;
+					opp-avg-kBps = <130718>, <130718>;
+					required-opps = <&rpmpd_opp_svs>;
+				};
+
+				opp-177770000 {
+					opp-hz = /bits/ 64 <177770000>;
+					opp-peak-kBps = <600000>, <600000>;
+					opp-avg-kBps = <261438>, <130718>;
+					required-opps = <&rpmpd_opp_nom>;
+				};
+
+				opp-200000000 {
+					opp-hz = /bits/ 64 <200000000>;
+					opp-peak-kBps = <800000>, <800000>;
+					opp-avg-kBps = <261438>, <130718>;
+					required-opps = <&rpmpd_opp_nom>;
+				};
+			};
 		};
 
 		blsp1_dma: dma-controller@7884000 {
