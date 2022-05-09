@@ -423,6 +423,98 @@
 		};
 	};
 
+	smsm {
+		compatible = "qcom,smsm";
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		qcom,ipc-1 = <&apcs 8 13>;
+		qcom,ipc-3 = <&apcs 8 19>;
+
+		apps_smsm: apps@0 {
+			reg = <0>;
+			#qcom,smem-state-cells = <1>;
+		};
+
+		modem_smsm: hexagon@1 {
+			reg = <1>;
+			interrupts = <GIC_SPI 26 IRQ_TYPE_EDGE_RISING>;
+
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		wcnss_smsm: wcnss@3 {
+			reg = <3>;
+			interrupts = <GIC_SPI 144 IRQ_TYPE_EDGE_RISING>;
+
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	modem-smp2p {
+		compatible = "qcom,smp2p";
+		qcom,smem = <435>, <428>;
+		interrupts = <GIC_SPI 27 IRQ_TYPE_EDGE_RISING>;
+		qcom,ipc = <&apcs 8 14>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <1>;
+
+		modem_smp2p_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		modem_smp2p_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	adsp-smp2p {
+		compatible = "qcom,smp2p";
+		qcom,smem = <443>, <429>;
+		interrupts = <GIC_SPI 291 IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&apcs 10>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <2>;
+
+		smp2p_adsp_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_adsp_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+	
+	wcnss-smp2p {
+		compatible = "qcom,smp2p";
+		qcom,smem = <451>, <431>;
+		interrupts = <GIC_SPI 143 IRQ_TYPE_EDGE_RISING>;
+		qcom,ipc = <&apcs 8 18>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <4>;
+
+		wcnss_smp2p_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		wcnss_smp2p_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
 	soc: soc {
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -563,7 +655,6 @@
 			};
 		};
 
-
 		msmgpio: pinctrl@1000000 {
 			compatible = "qcom,msm8917-pinctrl";
 			reg = <0x01000000 0x300000>;
@@ -690,7 +781,7 @@
 				     <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>;
 			#address-cells = <1>;
 			#size-cells = <1>;
-			#iommu-cells = <1>;
+			#iommu-cells = <2>;
 			#global-interrupts = <0>;
 		};
 
@@ -1211,6 +1302,201 @@
 					reset-names = "phy", "por";
 					qcom,init-seq = /bits/ 8 <0x0 0x44
 						0x1 0x6b 0x2 0x24 0x3 0x13>;
+				};
+			};
+		};
+
+		venus@1d00000 {
+			compatible = "qcom,msm8917-venus";
+			reg = <0x1d00000 0xff000>;
+
+			interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
+
+			clocks = <&gcc GCC_VENUS0_VCODEC0_CLK>,
+				 <&gcc GCC_VENUS0_AHB_CLK>,
+				 <&gcc GCC_VENUS0_AXI_CLK>,
+				 <&gcc GCC_VENUS0_CORE0_VCODEC0_CLK>;
+			clock-names = "core", "iface", "bus", "vcodec0";
+
+			operating-points-v2 = <&venus_opp_table>;
+
+			power-domains = <&gcc VENUS_GDSC>,
+					<&rpmpd MSM8937_VDDCX>;
+			power-domain-names = "venus", "cx";
+
+			interconnects = <&sysmmnoc MAS_VENUS &bimc SLV_EBI>,
+					<&bimc MAS_APPS_PROC &pcnoc SLV_VENUS_CFG>;
+			interconnect-names = "video-mem", "cpu-cfg";
+
+			iommus = <&apps_smmu 0x800 0x0>,
+				 <&apps_smmu 0x807 0x0>,
+				 <&apps_smmu 0x808 0x27>,
+				 <&apps_smmu 0x811 0x20>;
+
+			memory-region = <&venus_mem>;
+
+			video-decoder {
+				compatible = "venus-decoder";
+				power-domains = <&gcc VENUS_CORE0_GDSC>;
+			};
+
+			video-encoder {
+				compatible = "venus-encoder";
+				power-domains = <&gcc VENUS_CORE0_GDSC>;
+			};
+
+			venus_opp_table: venus-opp-table {
+				compatible = "operating-points-v2";
+
+				opp-160000000 {
+					opp-hz = /bits/ 64 <160000000>;
+					required-opps = <&rpmpd_opp_low_svs>;
+				};
+
+				opp-200000000 {
+					opp-hz = /bits/ 64 <200000000>;
+					required-opps = <&rpmpd_opp_svs>;
+				};
+
+				opp-270000000 {
+					opp-hz = /bits/ 64 <270000000>;
+					required-opps = <&rpmpd_opp_svs_plus>;
+				};
+
+				opp-308570000 {
+					opp-hz = /bits/ 64 <308570000>;
+					required-opps = <&rpmpd_opp_nom>;
+				};
+
+				opp-329140000 {
+					opp-hz = /bits/ 64 <329140000>;
+					required-opps = <&rpmpd_opp_nom_plus>;
+				};
+
+				opp-360000000 {
+					opp-hz = /bits/ 64 <360000000>;
+					required-opps = <&rpmpd_opp_turbo>;
+				};
+			};
+		};
+
+		modem: remoteproc@4080000 {
+			compatible = "qcom,msm8937-mss-pil";
+			reg = <0x4080000 0x100>,
+			      <0x4020000 0x040>;
+
+			reg-names = "qdsp6", "rmb";
+
+			interrupts-extended = <&intc 0 24 1>,
+					      <&modem_smp2p_in 0 0>,
+					      <&modem_smp2p_in 1 0>,
+					      <&modem_smp2p_in 2 0>,
+					      <&modem_smp2p_in 3 0>;
+			interrupt-names = "wdog", "fatal", "ready",
+					  "handover", "stop-ack";
+
+			clocks = <&gcc GCC_MSS_CFG_AHB_CLK>,
+				 <&gcc GCC_MSS_Q6_BIMC_AXI_CLK>,
+				 <&gcc GCC_BOOT_ROM_AHB_CLK>,
+				 <&xo_board>;
+			clock-names = "iface", "bus", "mem", "xo";
+
+			power-domains = <&rpmpd MSM8937_VDDCX>, <&rpmpd MSM8937_VDDMX>;
+			power-domain-names = "cx", "mx";
+
+			qcom,smem-states = <&modem_smp2p_out 0>;
+			qcom,smem-state-names = "stop";
+
+			resets = <&scm 0>;
+			reset-names = "mss_restart";
+
+			qcom,halt-regs = <&tcsr 0x18000 0x19000 0x1a000>;
+
+			status = "okay";
+
+			mba {
+				memory-region = <&mba_mem>;
+			};
+
+			mpss {
+				memory-region = <&mpss_mem>;
+			};
+
+			smd-edge {
+				interrupts = <GIC_SPI 25 IRQ_TYPE_EDGE_RISING>;
+
+				qcom,smd-edge = <0>;
+				qcom,ipc = <&apcs 8 12>;
+				qcom,remote-pid = <1>;
+
+				label = "modem";
+			};
+		};
+
+		pronto: remoteproc@a21b000 {
+			compatible = "qcom,pronto-v3-pil", "qcom,pronto";
+			reg = <0xa204000 0x2000>,
+			      <0xa202000 0x1000>,
+			      <0xa21b000 0x3000>;
+			reg-names = "ccu", "dxe", "pmu";
+
+			memory-region = <&wcnss_fw_mem>;
+
+			interrupts-extended = <&intc 0 149 IRQ_TYPE_EDGE_RISING>,
+					      <&wcnss_smp2p_in 0 IRQ_TYPE_EDGE_RISING>,
+					      <&wcnss_smp2p_in 1 IRQ_TYPE_EDGE_RISING>,
+					      <&wcnss_smp2p_in 2 IRQ_TYPE_EDGE_RISING>,
+					      <&wcnss_smp2p_in 3 IRQ_TYPE_EDGE_RISING>;
+			interrupt-names = "wdog", "fatal", "ready", "handover", "stop-ack";
+
+			power-domains = <&rpmpd MSM8937_VDDCX>, <&rpmpd MSM8937_VDDMX>;
+			power-domain-names = "cx", "mx";
+
+			qcom,state = <&wcnss_smp2p_out 0>;
+			qcom,state-names = "stop";
+
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&wcnss_default>;
+			pinctrl-1 = <&wcnss_sleep>;
+
+			status = "okay";
+
+			iris: iris {
+				compatible = "qcom,wcn3660b";
+
+				clocks = <&rpmcc RPM_SMD_RF_CLK2>;
+				clock-names = "xo";
+			};
+
+			smd-edge {
+				interrupts = <GIC_SPI 142 IRQ_TYPE_EDGE_RISING>;
+
+				qcom,ipc = <&apcs 8 17>;
+				qcom,smd-edge = <6>;
+				qcom,remote-pid = <4>;
+
+				label = "pronto";
+
+				wcnss {
+					compatible = "qcom,wcnss";
+					qcom,smd-channels = "WCNSS_CTRL";
+
+					qcom,mmio = <&pronto>;
+
+					bt {
+						compatible = "qcom,wcnss-bt";
+					};
+
+					wifi {
+						compatible = "qcom,wcnss-wlan";
+
+						interrupts = <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
+							     <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>;
+						interrupt-names = "tx", "rx";
+
+						qcom,smem-states = <&apps_smsm 10>, <&apps_smsm 9>;
+						qcom,smem-state-names = "tx-enable", "tx-rings-empty";
+					};
 				};
 			};
 		};
