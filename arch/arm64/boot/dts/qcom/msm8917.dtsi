@@ -726,7 +726,7 @@
 			reg = <0x1f00000 0x10000>;
 			reg-names = "base";
 			qcom,iommu-secure-id = <18>;
-			#iommu-cells = <2>;
+			#iommu-cells = <1>;
 			#global-interrupts = <0>;
 			#size-cells = <1>;
 			#address-cells = <1>;
@@ -735,6 +735,7 @@
 					<GIC_SPI 241 IRQ_TYPE_LEVEL_HIGH>,
 					<GIC_SPI 242 IRQ_TYPE_LEVEL_HIGH>,
 					<GIC_SPI 243 IRQ_TYPE_LEVEL_HIGH>;
+
 			clocks = <&gcc GCC_SMMU_CFG_CLK>,
 					<&gcc GCC_GFX_TCU_CLK>;
 			clock-names = "iface_clk", "core_clk";
@@ -931,19 +932,19 @@
 		};
 
 		gpu: gpu@1c00000 {
-			compatible = "qcom,adreno-306.0", "qcom,adreno";
+			compatible = "qcom,adreno-308.0", "qcom,adreno";
 			reg = <0x1c00000 0x20000>;
 			reg-names = "kgsl_3d0_reg_memory";
 			interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "kgsl_3d0_irq";
-			clock-names = "core", 
-						  "iface", 
-						  "mem_iface",
-						  "alt_mem_iface", 
-						  "gtcu_iface",
-						  "gtcu", 
-						  "gtbu",
-						  "gfx3d";
+			clock-names = "core",
+					"iface",
+					"mem_iface",
+					"alt_mem_iface",
+					"gtcu_iface",
+					"gtcu",
+					"gtbu",
+					"gfx3d";
 			clocks = <&gcc GCC_OXILI_GFX3D_CLK>,
 				 <&gcc GCC_OXILI_AHB_CLK>,
 				 <&gcc GCC_BIMC_GFX_CLK>,
@@ -957,7 +958,7 @@
 			#cooling-cells = <2>;
 			interconnects = <&bimc MAS_OXILI &bimc SLV_EBI>;
 			interconnect-names = "gfx-mem";
-			iommus = <&adreno_smmu 1 2>;
+			iommus = <&adreno_smmu 0>;
 
 			gpu_opp_table: opp-table {
 				compatible  ="operating-points-v2";
