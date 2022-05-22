@@ -388,6 +388,7 @@ CONFIG_DRM_PANEL_HX8394F_BOE=y
 CONFIG_FB=y
 # CONFIG_XEN_FBDEV_FRONTEND is not set
 CONFIG_BACKLIGHT_CLASS_DEVICE=y
+CONFIG_PWM=y
 CONFIG_BACKLIGHT_PWM=y
 CONFIG_BACKLIGHT_QCOM_WLED=y
 CONFIG_BACKLIGHT_LED=y
@@ -590,6 +591,8 @@ CONFIG_DEBUG_KERNEL=y
 # CONFIG_FTRACE is not set
 # CONFIG_RUNTIME_TESTING_MENU is not set
 CONFIG_MEMTEST=y
+#CONFIG_EXTRA_FIRMWARE="qcom/a300_pfp.fw qcom/a300_pm4.fw qcom/a530_pfp.fw qcom/a530_pm4.fw venus.mdt venus.b00 venus.b01 venus.b02 venus.b03 venus.b04 venus.mdt mba.mbn modem.mdt"
+#CONFIG_EXTRA_FIRMWARE="qcom/a300_pfp.fw qcom/a300_pm4.fw qcom/a530_pfp.fw qcom/a530_pm4.fw venus.mdt venus.b00 venus.b01 venus.b02 venus.b03 venus.b04 wcnss.mdt venus.mdt wcnss.b02 wcnss.b04 wcnss.b10 wcnss.b06 wcnss.b09 wcnss.b11 wcnss.b12 mba.mbn"
 CONFIG_EXTRA_FIRMWARE="qcom/a300_pfp.fw qcom/a300_pm4.fw qcom/a530_pfp.fw qcom/a530_pm4.fw"
 CONFIG_EXTRA_FIRMWARE_DIR="firmware"
 CONFIG_SECURITY_NETWORK=y
