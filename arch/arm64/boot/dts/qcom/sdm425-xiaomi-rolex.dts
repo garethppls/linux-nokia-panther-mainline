@@ -70,11 +70,6 @@
 		compatible = "gpio-vibrator";
 		enable-gpios = <&msmgpio 97 GPIO_ACTIVE_HIGH>;
 	};
-
-	usb_id: usb-id {
-		compatible = "linux,extcon-usb-gpio";
-		id-gpio = <&msmgpio 134 GPIO_ACTIVE_HIGH>;
-	};
 };
 
 &blsp_i2c2 {
@@ -161,6 +156,7 @@
 		summit,inok-polarity = <SMB3XX_SYSOK_INOK_ACTIVE_LOW>;
 		summit,soft-compensation-method = <SMB3XX_SOFT_TEMP_COMPENSATE_CURRENT>;
 		summit,chip-temperature-threshold-celsius = <100>;
+		summit,enable-mains-charging;
 		summit,enable-usb-charging;
 		summit,enable-otg-charging;
 
@@ -172,7 +168,6 @@
 			regulator-max-microvolt = <5000000>;
 			regulator-min-microamp = <750000>;
 			regulator-max-microamp = <750000>;
-			summit,needs-inok-toggle;
 		};
 	};
 
@@ -206,7 +201,7 @@
 
 		reset-gpios = <&msmgpio 60 GPIO_ACTIVE_LOW>;
 		
-		//backlight = <&backlight>;
+		backlight = <&backlight>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&mdss_dsi_active>;
 		pinctrl-1 = <&mdss_dsi_suspend>;
@@ -272,7 +267,7 @@
 	status = "okay";
 	qcom,init-seq = /bits/ 8 <0x39 0x81 0x37 0x82>;
 	vbus-supply = <&usb_vbus>;
-	extcon = <&power_supply>, <&power_supply>;
+	extcon = <&power_supply>;
 };
 
 &usb_hs_phy {
