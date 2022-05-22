@@ -204,6 +204,7 @@ struct smb347_charger {
 	bool			usb_online;
 	bool			irq_unsupported;
 	bool			usb_vbus_enabled;
+	bool			enable_apsd;
 
 	unsigned int		max_charge_current;
 	unsigned int		max_charge_voltage;
@@ -771,14 +772,16 @@ static int smb347_hw_init(struct smb347_charger *smb)
 	}
 
 	ret = regmap_update_bits(smb->regmap, CFG_PIN, CFG_PIN_EN_CTRL_MASK,
-				 val);
+                            	 val);
 	if (ret < 0)
 		goto fail;
 
-	/* Disable Automatic Power Source Detection (APSD) interrupt. */
-	ret = regmap_update_bits(smb->regmap, CFG_PIN, CFG_PIN_EN_APSD_IRQ, 0);
-	if (ret < 0)
-		goto fail;
+	if(!(smb->enable_apsd)) {
+		/* Disable Automatic Power Source Detection (APSD) interrupt. */
+		ret = regmap_update_bits(smb->regmap, CFG_PIN, CFG_PIN_EN_APSD_IRQ, 0);
+		if (ret < 0)
+			goto fail;
+	}
 
 	ret = smb347_update_ps_status(smb);
 	if (ret < 0)
@@ -1266,6 +1269,7 @@ static void smb347_dt_parse_dev_info(struct smb347_charger *smb)
 	smb->use_mains = device_property_read_bool(dev, "summit,enable-mains-charging");
 	smb->use_usb = device_property_read_bool(dev, "summit,enable-usb-charging");
 	smb->use_usb_otg = device_property_read_bool(dev, "summit,enable-otg-charging");
+	smb->enable_apsd = device_property_read_bool(dev, "summit,enable-apsd");
 
 	/* Select charging control */
 	device_property_read_u32(dev, "summit,enable-charge-control",
