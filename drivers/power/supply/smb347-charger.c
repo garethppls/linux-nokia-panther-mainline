@@ -54,6 +54,8 @@
 #define CFG_PIN_EN_CTRL_MASK			0x60
 #define CFG_PIN_EN_CTRL_ACTIVE_HIGH		0x40
 #define CFG_PIN_EN_CTRL_ACTIVE_LOW		0x60
+#define CFG_PIN_EN_CTRL_MASK_358		0x06
+#define CFG_PIN_EN_CTRL_ACTIVE_358		0x76
 #define CFG_PIN_EN_APSD_IRQ			BIT(1)
 #define CFG_PIN_EN_CHARGER_ERROR		BIT(2)
 #define CFG_PIN_EN_CTRL				BIT(4)
@@ -700,6 +702,7 @@ static int smb347_set_writable(struct smb347_charger *smb, bool writable,
 
 static int smb347_hw_init(struct smb347_charger *smb)
 {
+	unsigned int id = smb->id;
 	unsigned int val;
 	int ret;
 
@@ -771,8 +774,13 @@ static int smb347_hw_init(struct smb347_charger *smb)
 		break;
 	}
 
-	ret = regmap_update_bits(smb->regmap, CFG_PIN, CFG_PIN_EN_CTRL_MASK,
-                            	 val);
+	if(id != 3) {
+		ret = regmap_update_bits(smb->regmap, CFG_PIN, CFG_PIN_EN_CTRL_MASK,
+				 val);
+	} else {
+		ret = regmap_update_bits(smb->regmap, CFG_PIN, CFG_PIN_EN_CTRL_MASK_358,
+				 CFG_PIN_EN_CTRL_ACTIVE_358);
+	}
 	if (ret < 0)
 		goto fail;
 
@@ -1237,6 +1245,7 @@ static bool smb347_readable_reg(struct device *dev, unsigned int reg)
 static void smb347_dt_parse_dev_info(struct smb347_charger *smb)
 {
 	struct device *dev = smb->dev;
+	unsigned int id = smb->id;
 
 	smb->soft_temp_limit_compensation =
 					SMB3XX_SOFT_TEMP_COMPENSATE_DEFAULT;
@@ -1271,9 +1280,13 @@ static void smb347_dt_parse_dev_info(struct smb347_charger *smb)
 	smb->use_usb_otg = device_property_read_bool(dev, "summit,enable-otg-charging");
 	smb->enable_apsd = device_property_read_bool(dev, "summit,enable-apsd");
 
-	/* Select charging control */
-	device_property_read_u32(dev, "summit,enable-charge-control",
-				 &smb->enable_control);
+	if(id != 3) {
+		/* Select charging control */
+		device_property_read_u32(dev, "summit,enable-charge-control",
+					 &smb->enable_control);
+	} else {
+		smb->enable_control = SMB3XX_CHG_ENABLE_PIN_ACTIVE_LOW;
+	}
 
 	/*
 	 * Polarity of INOK signal indicating presence of external power
