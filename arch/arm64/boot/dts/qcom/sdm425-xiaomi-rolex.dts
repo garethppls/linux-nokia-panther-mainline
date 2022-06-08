@@ -153,12 +153,10 @@
 		reg = <0x57>;
 
 		summit,enable-charge-control = <SMB3XX_CHG_ENABLE_PIN_ACTIVE_HIGH>;
-		summit,inok-polarity = <SMB3XX_SYSOK_INOK_ACTIVE_LOW>;
 		summit,soft-compensation-method = <SMB3XX_SOFT_TEMP_COMPENSATE_CURRENT>;
 		summit,chip-temperature-threshold-celsius = <100>;
-		summit,enable-mains-charging;
 		summit,enable-usb-charging;
-		summit,enable-otg-charging;
+		summit,enable-apsd;
 
 		monitored-battery = <&bat>;
 
@@ -265,7 +263,7 @@
 
 &usb {
 	status = "okay";
-	qcom,init-seq = /bits/ 8 <0x39 0x81 0x37 0x82>;
+	qcom,init-seq = <0x39 0x81 0x37 0x82 0xffffffff>;
 	vbus-supply = <&usb_vbus>;
 	extcon = <&power_supply>;
 };

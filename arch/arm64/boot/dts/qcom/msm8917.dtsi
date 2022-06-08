@@ -1301,8 +1301,7 @@
 					clock-names = "ref", "sleep";
 					resets = <&gcc GCC_QUSB2_PHY_BCR>, <&usb 0>;
 					reset-names = "phy", "por";
-					qcom,init-seq = /bits/ 8 <0x0 0x44
-						0x1 0x6b 0x2 0x24 0x3 0x13>;
+					qcom,init-seq = <0x39 0x81 0x37 0x82 0xffffffff>;
 				};
 			};
 		};
